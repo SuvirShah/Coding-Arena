@@ -22,7 +22,11 @@ const register=async (req,res)=>{
 
         const token=jwt.sign({_id:user._id,emailId:emailId,role:'user'},process.env.JWT_KEY,{expiresIn:60*60});
 
-        res.cookie('token',token,{maxAge:60*60*1000});
+        res.cookie('token',token,{
+            maxAge:60*60*1000,
+            sameSite: "none",
+            secure: true
+        });
         const reply={
             firstName:user.firstName,
             emailId:user.emailId,
@@ -66,7 +70,11 @@ const login=async(req,res)=>{
 
         const token=jwt.sign({_id:user._id,emailId:emailId,role:user.role},process.env.JWT_KEY,{expiresIn:60*60});
 
-        res.cookie('token',token,{maxAge:60*60*1000});
+        res.cookie('token',token,{
+            maxAge:60*60*1000,
+            sameSite: "none",
+            secure: true
+        });
 
         const reply={
             firstName:user.firstName,
