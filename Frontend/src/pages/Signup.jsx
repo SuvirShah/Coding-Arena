@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser } from "./authSlice";
+import { registerUser, clearError } from "./authSlice";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 
@@ -18,6 +18,10 @@ function Signup() {
   const navigate = useNavigate();
 
   const { isAuthenticated, loading, error } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
 
   useEffect(() => {
     if (isAuthenticated) {
