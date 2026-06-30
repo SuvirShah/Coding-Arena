@@ -12,6 +12,7 @@ import AdminUpdateProblem from "./pages/AdminUpdateProbelm";
 import ProblemPage from "./pages/ProblemPage";
 import AdminUpload from "./components/AdminUpload";
 import AdminVideo from "./components/AdminVideo";
+import ProfilePage from "./pages/ProfilePage";
 
 function App(){
 
@@ -35,6 +36,7 @@ function App(){
       <Route path="/" element={isAuthenticated?<HomePage></HomePage>:<Navigate to='/signup'/>}></Route>
       <Route path="/login" element={isAuthenticated?<Navigate to='/'/>:<Login/>}></Route>
       <Route path="/signup" element={isAuthenticated?<Navigate to='/'/>:<Signup/>}></Route>
+      <Route path="/profile" element={isAuthenticated?<ProfilePage/>:<Navigate to='/login'/>} />
       <Route path="/problem/:problemId" element={<ProblemPage />}/>
       <Route path="/admin" element={isAuthenticated&&isAdmin?<AdminHome/>:<Navigate to='/'/>}></Route>
       <Route path="/admin/create" element={isAuthenticated&&isAdmin?<AdminPanel/>:<Navigate to='/'></Navigate>}/>

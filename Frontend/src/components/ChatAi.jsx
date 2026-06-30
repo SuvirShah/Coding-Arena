@@ -5,8 +5,7 @@ import { Send } from 'lucide-react';
 
 function ChatAi({problem}) {
     const [messages, setMessages] = useState([
-        { role: 'model', parts:[{text: "Hi, How are you"}]},
-        { role: 'user', parts:[{text: "I am Good"}]}
+        { role: 'model', parts:[{text: `Hi! I'm your AI assistant. How can I help you with "${problem?.title || 'this problem'}"?`}]}
     ]);
 
     const { register, handleSubmit, reset,formState: {errors} } = useForm();

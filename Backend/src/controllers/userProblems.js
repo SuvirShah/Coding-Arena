@@ -2,6 +2,7 @@ const {getLanguageById,submitBatch,submitToken}=require("../utils/ProblemUtility
 const Problem=require("../models/problems");
 const User=require("../models/user");
 const Submission = require("../models/submission");
+const SolutionVideo = require("../models/solutionVideo");
 
 const createProblem=async(req,res)=>{
     const {title,description,difficulty,tags,visibleTestCases,
@@ -106,20 +107,47 @@ const deleteProblem=async(req,res)=>{
         res.status(500).send("ERROR:"+err.message);
     }
 }
-const getProblemById=async(req,res)=>{
-    const {id}=req.params;
-    try{
-        if(!id){
+const getProblemById = async(req, res) => {
+    const { id } = req.params;
+    try {
+        if (!id) {
             return res.status(400).send("No Problem Id send");
-        }  
-        const getRequestedProblem=await Problem.findById(id).select('_id title description difficulty tags visibleTestCases startCode' );
-        if(!getRequestedProblem){
+        }
+        
+        // Determine if user has solved the problem or is admin
+        let isSolvedOrAdmin = false;
+        if (req.result && req.result._id) {
+            const userId = req.result._id;
+            const user = await User.findById(userId);
+            if (user && (user.problemSolved.includes(id) || user.role === 'admin')) {
+                isSolvedOrAdmin = true;
+            }
+        }
+
+        let selectFields = '_id title description difficulty tags visibleTestCases startCode';
+        if (isSolvedOrAdmin) {
+            selectFields += ' referenceSolution';
+        }
+
+        const getRequestedProblem = await Problem.findById(id).select(selectFields).lean();
+        
+        if (!getRequestedProblem) {
             return res.status(404).send("No Such Problem Exsists");
         }
+
+        // If solved/admin, also fetch video details if they exist
+        if (isSolvedOrAdmin) {
+            const video = await SolutionVideo.findOne({ problemId: id });
+            if (video) {
+                getRequestedProblem.secureUrl = video.secureUrl;
+                getRequestedProblem.thumbnailUrl = video.thumbnailUrl;
+                getRequestedProblem.duration = video.duration;
+            }
+        }
+
         res.status(200).send(getRequestedProblem);
-    }
-    catch(err){
-        res.status(404).send("ERror:"+err);
+    } catch(err) {
+        res.status(500).send("Error: " + err);
     }
 }
 const getAllProblem=async(req,res)=>{

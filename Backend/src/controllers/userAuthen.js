@@ -5,6 +5,7 @@ const bcrypt=require("bcrypt");
 const userMiddleware=require("../middleware/userMiddleware");
 const redisClient=require("../config/redis")
 const Submission=require("../models/submission");
+const Problem=require("../models/problems");
 
 const register=async (req,res)=>{
     try{
@@ -155,4 +156,74 @@ const checkUser=(req,res)=>{
     })
 
 }
-module.exports={register , login, logout, adminRegister,deleteProfile,checkUser };
+const getProfile=async(req,res)=>{
+    try{
+        const userId=req.result._id;
+
+        const user=await User.findById(userId).select('-password');
+        if(!user){
+            return res.status(404).json({message:"User not found"});
+        }
+
+        // Get solved problems with difficulty info
+        const solvedProblems=await Problem.find({
+            _id:{$in:user.problemSolved}
+        }).select('_id title difficulty tags');
+
+        // Difficulty breakdown
+        const difficultyCount={easy:0,medium:0,hard:0};
+        for(const problem of solvedProblems){
+            if(difficultyCount.hasOwnProperty(problem.difficulty)){
+                difficultyCount[problem.difficulty]++;
+            }
+        }
+
+        // Submission stats
+        const submissions=await Submission.find({userId:userId}).sort({createdAt:-1});
+        const totalSubmissions=submissions.length;
+        const acceptedSubmissions=submissions.filter(s=>s.status==='accepted').length;
+        const acceptanceRate=totalSubmissions>0
+            ?Math.round((acceptedSubmissions/totalSubmissions)*100)
+            :0;
+
+        const recentSubmissions=submissions.slice(0,10).map(sub=>({
+            _id:sub._id,
+            problemId:sub.problemId,
+            language:sub.language,
+            status:sub.status,
+            runtime:sub.runtime,
+            memory:sub.memory,
+            testCasesPassed:sub.testCasesPassed,
+            totalTestCases:sub.totalTestCases,
+            createdAt:sub.createdAt
+        }));
+
+        res.status(200).json({
+            user:{
+                _id:user._id,
+                firstName:user.firstName,
+                lastName:user.lastName,
+                emailId:user.emailId,
+                role:user.role,
+                createdAt:user.createdAt
+            },
+            problemsSolved:{
+                total:solvedProblems.length,
+                easy:difficultyCount.easy,
+                medium:difficultyCount.medium,
+                hard:difficultyCount.hard,
+                problems:solvedProblems
+            },
+            submissions:{
+                total:totalSubmissions,
+                accepted:acceptedSubmissions,
+                acceptanceRate:acceptanceRate,
+                recent:recentSubmissions
+            }
+        });
+    }
+    catch(err){
+        res.status(500).json({message:"Server Error:"+err.message});
+    }
+};
+module.exports={register , login, logout, adminRegister,deleteProfile,checkUser,getProfile };

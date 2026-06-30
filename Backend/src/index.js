@@ -18,7 +18,7 @@ const cors=require('cors');
 
 
 app.use(cors({
-    origin:"http://localhost:5173",
+    origin:"https://codearena-backend-g0bt.onrender.com",
     credentials:true
 }));
 
