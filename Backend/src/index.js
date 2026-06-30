@@ -17,8 +17,19 @@ const videoRouter=require("../src/routes/videoCreator");
 const cors=require('cors');
 
 
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://coding-arena-q2hl.vercel.app"
+];
+
 app.use(cors({
-    origin:"https://codearena-backend-g0bt.onrender.com",
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials:true
 }));
 
