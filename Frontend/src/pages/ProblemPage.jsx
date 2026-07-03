@@ -159,20 +159,27 @@ const ProblemPage = () => {
     <div className="h-screen flex flex-col bg-base-300 font-sans overflow-hidden">
       {/* Top Navbar specifically for IDE mode */}
       <div className="h-14 bg-base-100 border-b border-base-300 flex items-center justify-between px-4 shrink-0 shadow-sm z-10">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1">
           <button
             onClick={() => navigate("/")}
-            className="btn btn-ghost btn-sm px-2 text-base-content/70 hover:text-base-content hover:bg-base-200 transition-colors"
+            className="btn btn-ghost btn-sm text-sm font-semibold text-base-content/70 hover:text-primary normal-case"
             title="Back to Problems"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 mr-1">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
+            Home
           </button>
-          <span className="font-bold text-lg text-base-content tracking-tight flex items-center gap-2">
+          <span className="font-bold text-lg text-base-content tracking-tight flex items-center gap-2 mx-2">
             CodeArena
             <span className="badge badge-sm badge-outline border-base-content/20 text-base-content/50">IDE</span>
           </span>
+          <button
+            onClick={() => navigate("/visualizer")}
+            className="btn btn-ghost btn-sm text-sm font-semibold text-base-content/70 hover:text-primary normal-case"
+          >
+            🧠 Visualizer
+          </button>
         </div>
         {problem && (
           <div className="hidden md:flex items-center gap-3 bg-base-200/50 px-4 py-1.5 rounded-full border border-base-300">
