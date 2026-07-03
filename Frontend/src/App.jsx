@@ -13,6 +13,7 @@ import ProblemPage from "./pages/ProblemPage";
 import AdminUpload from "./components/AdminUpload";
 import AdminVideo from "./components/AdminVideo";
 import ProfilePage from "./pages/ProfilePage";
+import VisualizerApp from "./pages/Visualizer/VisualizerApp";
 
 function App(){
 
@@ -42,8 +43,9 @@ function App(){
       <Route path="/admin/create" element={isAuthenticated&&isAdmin?<AdminPanel/>:<Navigate to='/'></Navigate>}/>
       <Route path="/admin/update" element={isAuthenticated&&isAdmin?<AdminUpdateProblem/>:<Navigate to='/'/>}/>
       <Route path="/admin/delete" element={isAuthenticated&&isAdmin?<AdminDeleteProblem/>:<Navigate to='/'/>}/>
-     <Route path="/admin/video" element={isAuthenticated && user?.role === "admin" ? <AdminVideo /> : <Navigate to="/" />} />
+      <Route path="/admin/video" element={isAuthenticated && user?.role === "admin" ? <AdminVideo /> : <Navigate to="/" />} />
       <Route path="/admin/upload/:problemId" element={isAuthenticated && user?.role === "admin" ? <AdminUpload /> : <Navigate to="/" />} />
+      <Route path="/visualizer/*" element={<VisualizerApp />} />
     </Routes>
   )
   console.log({isAuthenticated,loading});

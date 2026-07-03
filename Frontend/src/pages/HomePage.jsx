@@ -80,12 +80,18 @@ function HomePage() {
       <div className="min-h-screen bg-base-200 font-sans">
         {/* Navbar */}
         <div className="navbar bg-base-100/90 backdrop-blur-md border-b border-base-300 px-4 md:px-8 shadow-sm sticky top-0 z-40">
-          <div className="flex-1">
+          <div className="flex-1 flex items-center">
             <button
               onClick={() => navigate("/")}
               className="btn btn-ghost text-2xl font-extrabold tracking-tight text-primary normal-case hover:bg-transparent"
             >
               CodeArena
+            </button>
+            <button
+              onClick={() => navigate("/visualizer")}
+              className="btn btn-ghost btn-sm text-sm font-semibold text-base-content/70 hover:text-primary normal-case ml-2"
+            >
+              🧠 Visualizer
             </button>
           </div>
 
