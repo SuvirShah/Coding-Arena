@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import TopicNav from "./TopicNav";
+import { Link } from "react-router";
 
 export default function LearningLayout({ children }) {
   const [mode, setMode] = useState("ds");
@@ -10,8 +11,18 @@ export default function LearningLayout({ children }) {
       {/* 1. ONE CLEAN SIDEBAR */}
       <aside className="w-72 flex flex-col bg-[#111827] border-r border-slate-800/60 shadow-xl z-10 flex-shrink-0">
         
+        {/* Global Back to App Link */}
+        <div className="p-4 border-b border-slate-800/60 bg-[#0A0F1C] flex items-center justify-center">
+          <Link to="/" className="w-full flex items-center justify-center py-2 px-3 bg-slate-800/40 hover:bg-slate-700/60 text-slate-400 hover:text-white rounded-lg border border-slate-700/50 transition-colors text-sm font-semibold">
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to CodeArena
+          </Link>
+        </div>
+
         {/* Top small mode switch (Pills style) */}
-        <div className="p-5 border-b border-slate-800/60 bg-[#0d1321]">
+        <div className="p-4 border-b border-slate-800/60 bg-[#0d1321]">
           <div className="flex bg-[#1e293b]/50 p-1 rounded-xl shadow-inner border border-slate-700/30">
             <button
               onClick={() => setMode("ds")}
