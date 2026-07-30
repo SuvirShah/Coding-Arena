@@ -1,11 +1,11 @@
-const { createClient }=require("redis");
+const { createClient } = require("redis");
 
 const redisClient = createClient({
     username: 'default',
     password: process.env.REDIS_PASS,
     socket: {
-        host: 'neovivid-silica-golden-94203.db.redis.io',
-        port: 16314
+        host: 'refreshing-tree-range-14648.db.redis.io',
+        port: 18479
     }
 });
 
@@ -17,4 +17,4 @@ const redisClient = createClient({
 // const result = await client.get('foo');
 // console.log(result)
 
-module.exports=redisClient;
+module.exports = redisClient;
