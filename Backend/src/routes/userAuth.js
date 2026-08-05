@@ -3,9 +3,10 @@ const {register , login, logout,adminRegister, deleteProfile,checkUser,getProfil
 const authRouter=express.Router();
 const userMiddleware=require("../middleware/userMiddleware")
 const adminMiddleware=require("../middleware/adminMiddleware");
+const rateLimiter=require("../middleware/rateLimiter");
 
-authRouter.post('/register',register);
-authRouter.post('/login',login);
+authRouter.post('/register',rateLimiter,register);
+authRouter.post('/login',rateLimiter,login);
 authRouter.post('/logout',userMiddleware,logout);
 authRouter.post('/admin/register',adminMiddleware,adminRegister);
 authRouter.post('/getProfile',userMiddleware,getProfile);

@@ -21,6 +21,7 @@ const allowedOrigins = [
     "http://localhost:5173",
     "https://coding-arena-q2hl.vercel.app"
 ];
+app.set('trust proxy',1);
 
 app.use(cors({
     origin: function (origin, callback) {
