@@ -1,34 +1,14 @@
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import axiosClient from "../utils/axiosClient";
 import { logoutUser } from "./authSlice";
+import { useGetProfileQuery } from "./apiSlice";
 
 function ProfilePage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
 
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
-        const { data } = await axiosClient.post("/user/getProfile");
-        setProfile(data);
-      } catch (err) {
-        console.error("Error fetching profile:", err);
-        setError(err.response?.data?.message || "Failed to load profile");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, []);
+  const { data: profile, isLoading: loading, isError, error: queryError } = useGetProfileQuery();
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -76,7 +56,7 @@ function ProfilePage() {
   }
 
   // Error state
-  if (error) {
+  if (isError) {
     return (
       <div className="min-h-screen bg-base-200">
         <div className="navbar bg-base-100 border-b border-base-300 px-4 md:px-8 shadow-sm">
@@ -90,7 +70,7 @@ function ProfilePage() {
           </div>
         </div>
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-          <div className="text-error text-lg font-medium">{error}</div>
+          <div className="text-error text-lg font-medium">{queryError?.data?.message || "Failed to load profile"}</div>
           <button onClick={() => navigate("/")} className="btn btn-primary btn-sm">
             Back to Home
           </button>

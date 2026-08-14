@@ -23,6 +23,7 @@ const register=async (req,res)=>{
         const token=jwt.sign({_id:user._id,emailId:emailId,role:'user'},process.env.JWT_KEY,{expiresIn:60*60});
 
         res.cookie('token',token,{
+            httpOnly: true,
             maxAge:60*60*1000,
             sameSite: "none",
             secure: true
@@ -71,6 +72,7 @@ const login=async(req,res)=>{
         const token=jwt.sign({_id:user._id,emailId:emailId,role:user.role},process.env.JWT_KEY,{expiresIn:60*60});
 
         res.cookie('token',token,{
+            httpOnly: true,
             maxAge:60*60*1000,
             sameSite: "none",
             secure: true
@@ -133,7 +135,7 @@ const adminRegister=async(req,res)=>{
 
         const token=jwt.sign({_id:user._id,emailId:emailId,role:user.role},process.env.JWT_KEY,{expiresIn:60*60});
 
-        res.cookie('token',token,{maxAge:60*60*1000});
+        res.cookie('token',token,{httpOnly: true,maxAge:60*60*1000});
         res.status(201).send("Admin created Sucessfully");
     }
     catch(err){

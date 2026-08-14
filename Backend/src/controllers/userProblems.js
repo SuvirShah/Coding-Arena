@@ -134,8 +134,6 @@ const getProblemById = async(req, res) => {
         if (!getRequestedProblem) {
             return res.status(404).send("No Such Problem Exsists");
         }
-
-        // If solved/admin, also fetch video details if they exist
         if (isSolvedOrAdmin) {
             const video = await SolutionVideo.findOne({ problemId: id });
             if (video) {

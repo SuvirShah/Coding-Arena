@@ -3,7 +3,7 @@ const User = require("../models/user");
 const Submission = require("../models/submission");
 const { getLanguageById, submitBatch, submitToken } = require("../utils/ProblemUtility");
 
-const submitCode = async (req, res) => {
+const submitCode  = async (req, res) => {
   try {
     const userId = req.result._id;
     const problemId = req.params.id;

@@ -1,6 +1,6 @@
 import React from "react";
-import { Routes, Route } from "react-router";
-import Home from "./components/Home";
+import { Routes, Route, Navigate } from "react-router";
+import { useSelector } from "react-redux";
 import LearningPage from "./pages/LearningPage";
 import ArrayVisualizer from "./pages/Array";
 import BFS from "./pages/BFS";
@@ -13,9 +13,11 @@ import SlidingWindow from "./pages/SlidingWindow";
 import TwoSum from "./pages/TwoSum";
 
 export default function VisualizerApp() {
+  const { activeTopic } = useSelector((state) => state.visualizer);
+
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<Navigate to={activeTopic} replace />} />
       <Route path="learn/*" element={<LearningPage />} />
       <Route path="array" element={<ArrayVisualizer />} />
       <Route path="bfs" element={<BFS />} />

@@ -2,16 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import Editor from "@monaco-editor/react";
 import { useParams, useNavigate } from "react-router";
-import axiosClient from "../utils/axiosClient";
+import { useGetProblemByIdQuery, useRunCodeMutation, useSubmitCodeMutation } from "./apiSlice";
 import SubmissionHistory from "../components/SubmissionHistory";
 import ChatAi from "../components/ChatAi";
 import Editorial from "../components/Editorial";
 
 const ProblemPage = () => {
-  const [problem, setProblem] = useState(null);
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
   const [code, setCode] = useState("");
-  const [loading, setLoading] = useState(false);
   const [runResult, setRunResult] = useState(null);
   const [submitResult, setSubmitResult] = useState(null);
   const [activeLeftTab, setActiveLeftTab] = useState("description");
@@ -22,29 +20,11 @@ const ProblemPage = () => {
 
   const { handleSubmit } = useForm();
 
-  const fetchProblem = async () => {
-    setLoading(true);
-    try {
-      const response = await axiosClient.get(`/problem/ProblemById/${problemId}`);
-      const problemData = response.data;
+  const { data: problem, isLoading: isFetchingProblem } = useGetProblemByIdQuery(problemId);
+  const [runCode, { isLoading: isRunning }] = useRunCodeMutation();
+  const [submitCodeMutation, { isLoading: isSubmitting }] = useSubmitCodeMutation();
 
-      setProblem(problemData);
-
-      const matchedCode = problemData?.startCode?.find(
-        (sc) => sc.language === selectedLanguage
-      );
-
-      setCode(matchedCode?.boilerplate || "");
-    } catch (error) {
-      console.error("Error fetching problem:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProblem();
-  }, [problemId]);
+  const loading = isRunning || isSubmitting;
 
   useEffect(() => {
     if (problem) {
@@ -68,16 +48,12 @@ const ProblemPage = () => {
   };
 
   const handleRun = async () => {
-    setLoading(true);
     setRunResult(null);
 
     try {
-      const response = await axiosClient.post(`/submission/run/${problemId}`, {
-        code,
-        language: selectedLanguage,
-      });
+      const result = await runCode({ problemId, code, language: selectedLanguage }).unwrap();
 
-      setRunResult(response.data);
+      setRunResult(result);
       setActiveRightTab("testcase");
     } catch (error) {
       console.error("Error running code:", error);
@@ -86,27 +62,17 @@ const ProblemPage = () => {
         error: "Internal server error",
       });
       setActiveRightTab("testcase");
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleSubmitCode = async () => {
-    setLoading(true);
     setSubmitResult(null);
 
     try {
-      const response = await axiosClient.post(`/submission/submit/${problemId}`, {
-        code,
-        language: selectedLanguage,
-      });
+      const result = await submitCodeMutation({ problemId, code, language: selectedLanguage }).unwrap();
 
-      setSubmitResult(response.data);
+      setSubmitResult(result);
       setActiveRightTab("result");
-      
-      if (response.data.accepted) {
-        await fetchProblem();
-      }
     } catch (error) {
       console.error("Error submitting code:", error);
       setSubmitResult({
@@ -116,8 +82,6 @@ const ProblemPage = () => {
         totalTestCases: 0,
       });
       setActiveRightTab("result");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -147,7 +111,7 @@ const ProblemPage = () => {
     }
   };
 
-  if (loading && !problem) {
+  if (isFetchingProblem) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-base-200">
         <span className="loading loading-spinner loading-lg text-primary"></span>
@@ -174,12 +138,7 @@ const ProblemPage = () => {
             CodeArena
             <span className="badge badge-sm badge-outline border-base-content/20 text-base-content/50">IDE</span>
           </span>
-          <button
-            onClick={() => navigate("/visualizer")}
-            className="btn btn-ghost btn-sm text-sm font-semibold text-base-content/70 hover:text-primary normal-case"
-          >
-            🧠 Visualizer
-          </button>
+
         </div>
         {problem && (
           <div className="hidden md:flex items-center gap-3 bg-base-200/50 px-4 py-1.5 rounded-full border border-base-300">

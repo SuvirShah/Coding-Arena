@@ -1,35 +1,107 @@
 import React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router";
+import { useSelector, useDispatch } from "react-redux";
+import { 
+    setActiveTopic, 
+    updateVisualizationData, 
+    setCurrentStep, 
+    setIsPlaying, 
+    setSpeed 
+} from "../../../store/visualizerSlice";
+
+const DEFAULT_DATA = {
+    array: [64, 34, 25, 12, 22, 11, 90],
+    originalArray: [64, 34, 25, 12, 22, 11, 90],
+    comparing: [-1, -1],
+    sorted: [],
+    algorithm: [],
+    complete: false,
+};
 
 export default function BubbleSort() {
-    const [array, setarray] = useState([64, 34, 25, 12, 22, 11, 90]);
-    const [originalArray, setoriginalArray] = useState([64, 34, 25, 12, 22, 11, 90]);
-    const [comparing, setComparing] = useState([-1, -1]);
-    const [currentStep, setCurrentStep] = useState(0);
-    const [sorted, setSorted] = useState([]);
-    const [isPlaying, setisPlaying] = useState(false);
-    const [speed, setspeed] = useState(500);
-    const [algorithm, setalgorithm] = useState([]);
-    const [complete, iscomplete] = useState(false);
-    const timeoutRef = useRef(null);
+    const dispatch = useDispatch();
+    const { 
+        visualizationData, 
+        currentStep, 
+        isPlaying, 
+        speed 
+    } = useSelector((state) => state.visualizer);
 
-    const generateRandomArray = () => {
-        const newArray = Array.from({ length: 8 }, () => Math.floor(Math.random() * 100 + 1));
-        setarray(newArray);
-        setoriginalArray(newArray);
-        resetVisualization();
-    };
-    const resetVisualization = () => {
-        setComparing([-1, -1]);
-        setSorted([]);
-        setisPlaying(false);
-        setCurrentStep(0);
-        setalgorithm([]);
-        iscomplete(false);
-        setarray([...originalArray]);
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
+    const timerRef = useRef(null);
+
+    // Live refs to avoid stale closures in the interval callback
+    const stepRef = useRef(currentStep);
+    const dataRef = useRef(visualizationData);
+
+    // Keep refs in sync with Redux state on every render
+    useEffect(() => { stepRef.current = currentStep; }, [currentStep]);
+    useEffect(() => { dataRef.current = visualizationData; }, [visualizationData]);
+
+    // Derive display values (never stale — read fresh each render)
+    const stateData = visualizationData || DEFAULT_DATA;
+    const { array, originalArray, comparing, sorted, algorithm, complete } = stateData;
+
+    // --- Mount: set topic + seed initial data if empty ---
+    useEffect(() => {
+        dispatch(setActiveTopic('bubble-sort'));
+        if (!visualizationData) {
+            dispatch(updateVisualizationData(DEFAULT_DATA));
+        }
+        return () => {
+            if (timerRef.current) clearInterval(timerRef.current);
+            dispatch(setIsPlaying(false));
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dispatch]);
+
+    // --- Helper: apply a single algorithm step to Redux ---
+    const applyStep = useCallback((stepObj, currentSorted, currentData) => {
+        const base = { ...currentData };
+        if (stepObj.type === "compare") {
+            dispatch(updateVisualizationData({ ...base, comparing: stepObj.indices, array: stepObj.array }));
+        } else if (stepObj.type === "swap") {
+            dispatch(updateVisualizationData({ ...base, array: stepObj.array }));
+        } else if (stepObj.type === "sorted") {
+            dispatch(updateVisualizationData({ ...base, sorted: [...currentSorted, ...stepObj.indices], comparing: [-1, -1] }));
+        } else if (stepObj.type === "completed") {
+            dispatch(updateVisualizationData({ ...base, sorted: [...currentSorted, ...stepObj.indices], comparing: [-1, -1], complete: true }));
+            dispatch(setIsPlaying(false));
+        }
+    }, [dispatch]);
+
+    // --- Core playback loop (setInterval + refs) ---
+    useEffect(() => {
+        if (!isPlaying) {
+            if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+            return;
+        }
+
+        timerRef.current = setInterval(() => {
+            const data = dataRef.current || DEFAULT_DATA;
+            const steps = data.algorithm || [];
+            const step = stepRef.current;
+
+            if (step < steps.length) {
+                const stepObj = steps[step];
+                const currentSorted = data.sorted || [];
+                applyStep(stepObj, currentSorted, data);
+                const nextStep = step + 1;
+                stepRef.current = nextStep;
+                dispatch(setCurrentStep(nextStep));
+            } else {
+                dispatch(setIsPlaying(false));
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
+        }, speed);
+
+        return () => {
+            if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+        };
+    }, [isPlaying, speed, dispatch, applyStep]);
+
+    // --- Generate algorithm steps (pure function) ---
     const generateAlgorithmSteps = (arr) => {
         const steps = [];
         const arrayLength = arr.length;
@@ -68,60 +140,75 @@ export default function BubbleSort() {
         });
         return steps;
     };
+
+    // --- Button handlers ---
     const StartVisualization = () => {
-        if (algorithm.length === 0) {
+        let currentAlgorithm = algorithm;
+        if (currentAlgorithm.length === 0) {
             const steps = generateAlgorithmSteps(array);
-            setalgorithm(steps);
+            const newData = { ...stateData, algorithm: steps };
+            dispatch(updateVisualizationData(newData));
+            dataRef.current = newData; // Immediately update ref so the interval sees it
         }
-        setisPlaying(true);
-    }
+        dispatch(setIsPlaying(true));
+    };
+
     const PauseVisualization = () => {
-        setisPlaying(false);
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    }
+        dispatch(setIsPlaying(false));
+    };
+
     const NextStep = () => {
         if (currentStep < algorithm.length) {
-            executeStep(algorithm[currentStep]);
-            setCurrentStep(currentStep + 1);
+            applyStep(algorithm[currentStep], sorted, stateData);
+            const next = currentStep + 1;
+            stepRef.current = next;
+            dispatch(setCurrentStep(next));
         }
-    }
-    const executeStep = (step) => {
-        if (step.type === "compare") {
-            setComparing(step.indices);
-            setarray(step.array);
-        }
-        else if (step.type === "swap") setarray(step.array);
-        else if (step.type === "sorted") {
-            setSorted(prev => [...prev, ...step.indices]);
-            setComparing([-1, -1]);
-        }
-        else if (step.type === "completed") {
-            setSorted(prev => [...prev, ...step.indices]);
-            setComparing([-1, -1]);
-            iscomplete(true);
-            setisPlaying(false);
-        }
-    }
-    useEffect(() => {
-        if (isPlaying && currentStep < algorithm.length) {
-            timeoutRef.current = setTimeout(() => {
-                executeStep(algorithm[currentStep]);
-                setCurrentStep(currentStep + 1);
-            }, speed);
-        }
-        else if (currentStep >= algorithm.length) setisPlaying(false);
-        return () => {
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        };
+    };
 
-    }, [isPlaying, currentStep, algorithm, speed]);
+    const generateRandomArray = () => {
+        if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+        const newArray = Array.from({ length: 8 }, () => Math.floor(Math.random() * 100 + 1));
+        const newData = {
+            array: newArray,
+            originalArray: newArray,
+            comparing: [-1, -1],
+            sorted: [],
+            algorithm: [],
+            complete: false,
+        };
+        dispatch(updateVisualizationData(newData));
+        dataRef.current = newData;
+        stepRef.current = 0;
+        dispatch(setCurrentStep(0));
+        dispatch(setIsPlaying(false));
+    };
+
+    const handleResetVisualization = () => {
+        if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+        const newData = {
+            array: [...originalArray],
+            originalArray: [...originalArray],
+            comparing: [-1, -1],
+            sorted: [],
+            algorithm: [],
+            complete: false,
+        };
+        dispatch(updateVisualizationData(newData));
+        dataRef.current = newData;
+        stepRef.current = 0;
+        dispatch(setCurrentStep(0));
+        dispatch(setIsPlaying(false));
+    };
 
     const SetBarColor = (idx) => {
         if (sorted.includes(idx)) return 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]';
         if (comparing.includes(idx)) return 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]';
         return 'bg-blue-500/80 border border-blue-400/50';
-    }
+    };
+
     const MaxVal = Math.max(...array);
+
     return (
         <div className="min-h-screen bg-slate-950 text-slate-300 p-6 md:p-10 selection:bg-blue-500/30">
             <div className="max-w-7xl mx-auto space-y-8">
@@ -129,7 +216,7 @@ export default function BubbleSort() {
                 {/* Header */}
                 <div className="flex flex-col items-center justify-center text-center mb-8">
                     <div className="w-full flex justify-start mb-4">
-                        <Link to={"/visualizer"} className="inline-flex items-center text-slate-400 hover:text-blue-400 font-medium transition-colors bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-800 hover:border-blue-500/30 backdrop-blur-md">
+                        <Link to={"/visualizer/learn/algo/bubble-sort"} className="inline-flex items-center text-slate-400 hover:text-blue-400 font-medium transition-colors bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-800 hover:border-blue-500/30 backdrop-blur-md">
                             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                             </svg>
@@ -156,7 +243,7 @@ export default function BubbleSort() {
                         <button onClick={NextStep} disabled={isPlaying || currentStep >= algorithm.length} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-300 rounded-xl transition-all font-semibold">
                             Step ⏩
                         </button>
-                        <button onClick={resetVisualization} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-all font-semibold">
+                        <button onClick={handleResetVisualization} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-all font-semibold">
                             ↺ Reset
                         </button>
                         <button onClick={generateRandomArray} disabled={isPlaying} className="px-6 py-3 bg-purple-500/20 hover:bg-purple-500/30 disabled:opacity-50 text-purple-400 border border-purple-500/30 rounded-xl transition-all font-semibold">
@@ -169,7 +256,7 @@ export default function BubbleSort() {
                             <span>Animation Speed</span>
                             <span className="font-mono">{2100 - speed}ms</span>
                         </div>
-                        <input type="range" min={100} max={2000} value={speed} onChange={(e) => setspeed(Number(e.target.value))} className="w-full sm:w-48 accent-blue-500 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer" />
+                        <input type="range" min={100} max={2000} value={speed} onChange={(e) => dispatch(setSpeed(Number(e.target.value)))} className="w-full sm:w-48 accent-blue-500 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer" />
                     </div>
                 </div>
 

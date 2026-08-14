@@ -15,6 +15,8 @@ const submitRouter = require("./routes/submit");
 const aiRouter=require('../src/routes/aiChatting');
 const videoRouter=require("../src/routes/videoCreator");
 const cors=require('cors');
+const helmet=require("helmet");
+
 
 
 const allowedOrigins = [
@@ -22,7 +24,7 @@ const allowedOrigins = [
     "https://coding-arena-q2hl.vercel.app"
 ];
 app.set('trust proxy',1);
-
+app.use(helmet());
 app.use(cors({
     origin: function (origin, callback) {
         if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
@@ -34,7 +36,7 @@ app.use(cors({
     credentials:true
 }));
 
-app.use(express.json());
+app.use(express.json({limit:'50kb'}));
 app.use(cookieParser());
 
 app.use("/user",authRouter);
