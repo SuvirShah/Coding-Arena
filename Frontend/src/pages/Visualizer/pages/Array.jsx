@@ -429,22 +429,22 @@ export default function ArrayVisualizer() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-300 p-6 md:p-10 selection:bg-blue-500/30">
+    <div className="min-h-screen bg-[#0f0d0a] text-[#EAEAEA] p-6 md:p-10 selection:bg-yellow-500/30">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 tracking-tight mb-4">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-[#a09880] tracking-tight mb-4">
             Array Visualization
           </h1>
-          <p className="text-lg text-slate-400 font-light">
+          <p className="text-lg text-[#a09880] font-light">
             Interactive 1D & 2D Array Visualizations with step-by-step execution
           </p>
         </div>
 
         {/* Dimension Toggle */}
         <div className="flex justify-center">
-          <div className="inline-flex bg-slate-900/80 backdrop-blur-md rounded-2xl p-1.5 border border-slate-800 shadow-xl">
+          <div className="inline-flex bg-[#1a1611]/80 backdrop-blur-md rounded-2xl p-1.5 border border-[#332b21] shadow-xl">
             <button
               onClick={() => {
                 setArrayType("1D");
@@ -452,8 +452,8 @@ export default function ArrayVisualizer() {
               }}
               className={`px-8 py-2.5 rounded-xl font-medium transition-all duration-300 ${
                 arrayType === "1D"
-                  ? "bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)]"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+                  ? "bg-[#FFD700] text-black font-bold shadow-[0_0_20px_rgba(255,215,0,0.3)]"
+                  : "text-[#a09880] hover:text-white hover:bg-[#332b21]/50"
               }`}
             >
               1D Array
@@ -465,8 +465,8 @@ export default function ArrayVisualizer() {
               }}
               className={`px-8 py-2.5 rounded-xl font-medium transition-all duration-300 ${
                 arrayType === "2D"
-                  ? "bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)]"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+                  ? "bg-[#FFD700] text-black font-bold shadow-[0_0_20px_rgba(255,215,0,0.3)]"
+                  : "text-[#a09880] hover:text-white hover:bg-[#332b21]/50"
               }`}
             >
               2D Array
@@ -475,8 +475,8 @@ export default function ArrayVisualizer() {
         </div>
 
         {/* Main Canvas */}
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl min-h-[300px] flex flex-col items-center justify-center">
-          <h3 className="text-xl font-medium text-slate-200 mb-10 tracking-wide uppercase text-sm">
+        <div className="bg-[#1a1611]/50 backdrop-blur-xl border border-[#332b21] rounded-3xl p-8 shadow-2xl min-h-[300px] flex flex-col items-center justify-center">
+          <h3 className="text-xl font-medium text-[#EAEAEA] mb-10 tracking-wide uppercase text-sm">
             {arrayType === "1D" ? "1D Layout" : "2D Grid"}
           </h3>
 
@@ -487,13 +487,13 @@ export default function ArrayVisualizer() {
                   <div
                     className={`w-16 h-16 flex items-center justify-center border-2 rounded-2xl font-bold text-xl transition-all duration-300 ${
                       highlightidx === index
-                        ? "bg-blue-500/20 border-blue-400 text-blue-300 shadow-[0_0_25px_rgba(59,130,246,0.4)] scale-110"
-                        : "bg-slate-800/50 border-slate-700 text-slate-300 group-hover:border-slate-600 group-hover:bg-slate-800"
+                        ? "bg-yellow-500/20 border-yellow-400 text-yellow-300 shadow-[0_0_25px_rgba(255,215,0,0.4)] scale-110"
+                        : "bg-[#332b21]/50 border-[#3d3326] text-[#EAEAEA] group-hover:border-[#524433] group-hover:bg-[#332b21]"
                     }`}
                   >
                     {value}
                   </div>
-                  <div className="text-xs text-slate-500 mt-2 font-mono">[{index}]</div>
+                  <div className="text-xs text-[#7a7260] mt-2 font-mono">[{index}]</div>
                 </div>
               ))}
             </div>
@@ -508,12 +508,12 @@ export default function ArrayVisualizer() {
                           className={`w-16 h-16 flex items-center justify-center border-2 rounded-2xl font-bold text-xl transition-all duration-300 ${
                             highlight2D[0] === rowIndex && highlight2D[1] === colIndex
                               ? "bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_25px_rgba(16,185,129,0.4)] scale-110"
-                              : "bg-slate-800/50 border-slate-700 text-slate-300 group-hover:border-slate-600 group-hover:bg-slate-800"
+                              : "bg-[#332b21]/50 border-[#3d3326] text-[#EAEAEA] group-hover:border-[#524433] group-hover:bg-[#332b21]"
                           }`}
                         >
                           {value}
                         </div>
-                        <div className="text-[10px] text-slate-500 mt-2 font-mono tracking-tighter">
+                        <div className="text-[10px] text-[#7a7260] mt-2 font-mono tracking-tighter">
                           [{rowIndex}][{colIndex}]
                         </div>
                       </div>
@@ -529,20 +529,20 @@ export default function ArrayVisualizer() {
         <div className="grid lg:grid-cols-2 gap-6">
           
           {/* Action Panel */}
-          <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
-            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Playback & Generation</h3>
+          <div className="bg-[#1a1611]/50 backdrop-blur-xl border border-[#332b21] rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+            <h3 className="text-sm font-semibold text-[#a09880] uppercase tracking-wider mb-4">Playback & Generation</h3>
             
             <div className="flex flex-wrap gap-3">
-              <button onClick={arrayType === "1D" ? generate1Darray : generate2Darray} className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl transition-all shadow-sm text-sm font-medium">
+              <button onClick={arrayType === "1D" ? generate1Darray : generate2Darray} className="px-5 py-2.5 bg-[#332b21] hover:bg-[#3d3326] text-[#EAEAEA] border border-[#3d3326] rounded-xl transition-all shadow-sm text-sm font-medium">
                 🎲 Random {arrayType}
               </button>
-              <button onClick={resetVisualization} className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl transition-all shadow-sm text-sm font-medium">
+              <button onClick={resetVisualization} className="px-5 py-2.5 bg-[#332b21] hover:bg-[#3d3326] text-[#EAEAEA] border border-[#3d3326] rounded-xl transition-all shadow-sm text-sm font-medium">
                 ↺ Reset
               </button>
             </div>
 
             <div className="flex flex-wrap gap-3 pt-2">
-              <button onClick={PlayVisualization} disabled={isPlaying || steps.length === 0} className="flex-1 px-5 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:text-slate-500 disabled:border-slate-700 disabled:shadow-none text-white rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.2)] font-semibold flex items-center justify-center gap-2">
+              <button onClick={PlayVisualization} disabled={isPlaying || steps.length === 0} className="flex-1 px-5 py-3 bg-[#FFD700] hover:bg-[#E6C200] disabled:bg-[#332b21] disabled:text-[#7a7260] disabled:border-[#3d3326] disabled:shadow-none text-black font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(255,215,0,0.2)] flex items-center justify-center gap-2">
                 ▶ Play
               </button>
               <button onClick={PauseVisualization} disabled={!isPlaying} className="flex-1 px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all font-semibold flex items-center justify-center gap-2">
@@ -551,16 +551,16 @@ export default function ArrayVisualizer() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <button onClick={StepBackward} disabled={isPlaying || currentstep <= 0} className="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 rounded-xl transition-all text-sm font-medium">
+              <button onClick={StepBackward} disabled={isPlaying || currentstep <= 0} className="flex-1 px-4 py-2 bg-[#332b21] hover:bg-[#3d3326] disabled:opacity-50 text-[#EAEAEA] rounded-xl transition-all text-sm font-medium">
                 ⏪ Prev Step
               </button>
-              <button onClick={StepForward} disabled={isPlaying || currentstep >= steps.length} className="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 rounded-xl transition-all text-sm font-medium">
+              <button onClick={StepForward} disabled={isPlaying || currentstep >= steps.length} className="flex-1 px-4 py-2 bg-[#332b21] hover:bg-[#3d3326] disabled:opacity-50 text-[#EAEAEA] rounded-xl transition-all text-sm font-medium">
                 Next Step ⏩
               </button>
             </div>
 
-            <div className="pt-4 border-t border-slate-800">
-              <div className="flex justify-between text-xs text-slate-400 mb-2 font-medium">
+            <div className="pt-4 border-t border-[#332b21]">
+              <div className="flex justify-between text-xs text-[#a09880] mb-2 font-medium">
                 <span>Animation Speed</span>
                 <span className="font-mono">{speed}ms</span>
               </div>
@@ -571,49 +571,49 @@ export default function ArrayVisualizer() {
                 step="100"
                 value={speed}
                 onChange={(e) => setspeed(Number(e.target.value))}
-                className="w-full accent-blue-500 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer"
+                className="w-full accent-yellow-500 h-2 bg-[#332b21] rounded-lg appearance-none cursor-pointer"
               />
             </div>
           </div>
 
           {/* Operation Panel */}
-          <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col">
-            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-6">Operations</h3>
+          <div className="bg-[#1a1611]/50 backdrop-blur-xl border border-[#332b21] rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col">
+            <h3 className="text-sm font-semibold text-[#a09880] uppercase tracking-wider mb-6">Operations</h3>
             
             {arrayType === "1D" ? (
               <div className="space-y-5 flex-1">
                 <div className="grid grid-cols-2 gap-4">
-                  <input type="number" placeholder="Value" value={inputVal} onChange={(e) => setinputVal(e.target.value)} className="bg-slate-950 border border-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 text-slate-200 p-3 rounded-xl outline-none transition-all placeholder:text-slate-600" />
-                  <input type="number" placeholder="Index" value={inputidx} onChange={(e) => setinputidx(e.target.value)} className="bg-slate-950 border border-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 text-slate-200 p-3 rounded-xl outline-none transition-all placeholder:text-slate-600" />
+                  <input type="number" placeholder="Value" value={inputVal} onChange={(e) => setinputVal(e.target.value)} className="bg-[#0f0d0a] border border-[#332b21] focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/50 text-[#EAEAEA] p-3 rounded-xl outline-none transition-all placeholder:text-[#5e5645]" />
+                  <input type="number" placeholder="Index" value={inputidx} onChange={(e) => setinputidx(e.target.value)} className="bg-[#0f0d0a] border border-[#332b21] focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/50 text-[#EAEAEA] p-3 rounded-xl outline-none transition-all placeholder:text-[#5e5645]" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <button onClick={addElement1D} className="px-4 py-3 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 rounded-xl transition-all font-medium">Add Element</button>
+                  <button onClick={addElement1D} className="px-4 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/30 rounded-xl transition-all font-medium">Add Element</button>
                   <button onClick={deleteElement1D} className="px-4 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl transition-all font-medium">Delete by Index</button>
                 </div>
-                <div className="pt-4 border-t border-slate-800 grid grid-cols-2 gap-4">
-                  <input type="number" placeholder="Search Value" value={searchVal} onChange={(e) => setsearchVal(e.target.value)} className="bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 text-slate-200 p-3 rounded-xl outline-none transition-all placeholder:text-slate-600" />
+                <div className="pt-4 border-t border-[#332b21] grid grid-cols-2 gap-4">
+                  <input type="number" placeholder="Search Value" value={searchVal} onChange={(e) => setsearchVal(e.target.value)} className="bg-[#0f0d0a] border border-[#332b21] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 text-[#EAEAEA] p-3 rounded-xl outline-none transition-all placeholder:text-[#5e5645]" />
                   <button onClick={searchElement1D} className="px-4 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 rounded-xl transition-all font-medium">Search 1D</button>
                 </div>
               </div>
             ) : (
               <div className="space-y-5 flex-1">
                 <div className="grid grid-cols-3 gap-3">
-                  <input type="number" placeholder="Val" value={inputVal} onChange={(e) => setinputVal(e.target.value)} className="bg-slate-950 border border-slate-800 focus:border-blue-500 text-slate-200 p-3 rounded-xl outline-none transition-all placeholder:text-slate-600" />
-                  <input type="number" placeholder="Row" value={inputrow} onChange={(e) => setinputrow(e.target.value)} className="bg-slate-950 border border-slate-800 focus:border-blue-500 text-slate-200 p-3 rounded-xl outline-none transition-all placeholder:text-slate-600" />
-                  <input type="number" placeholder="Col" value={inputcol} onChange={(e) => setinputcol(e.target.value)} className="bg-slate-950 border border-slate-800 focus:border-blue-500 text-slate-200 p-3 rounded-xl outline-none transition-all placeholder:text-slate-600" />
+                  <input type="number" placeholder="Val" value={inputVal} onChange={(e) => setinputVal(e.target.value)} className="bg-[#0f0d0a] border border-[#332b21] focus:border-yellow-500 text-[#EAEAEA] p-3 rounded-xl outline-none transition-all placeholder:text-[#5e5645]" />
+                  <input type="number" placeholder="Row" value={inputrow} onChange={(e) => setinputrow(e.target.value)} className="bg-[#0f0d0a] border border-[#332b21] focus:border-yellow-500 text-[#EAEAEA] p-3 rounded-xl outline-none transition-all placeholder:text-[#5e5645]" />
+                  <input type="number" placeholder="Col" value={inputcol} onChange={(e) => setinputcol(e.target.value)} className="bg-[#0f0d0a] border border-[#332b21] focus:border-yellow-500 text-[#EAEAEA] p-3 rounded-xl outline-none transition-all placeholder:text-[#5e5645]" />
                 </div>
-                <button onClick={addElement2D} className="w-full px-4 py-3 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 rounded-xl transition-all font-medium">Update Cell</button>
+                <button onClick={addElement2D} className="w-full px-4 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/30 rounded-xl transition-all font-medium">Update Cell</button>
                 
-                <div className="pt-4 border-t border-slate-800 grid grid-cols-2 gap-4">
-                  <input type="number" placeholder="Search" value={searchVal} onChange={(e) => setsearchVal(e.target.value)} className="bg-slate-950 border border-slate-800 focus:border-emerald-500 text-slate-200 p-3 rounded-xl outline-none transition-all placeholder:text-slate-600" />
+                <div className="pt-4 border-t border-[#332b21] grid grid-cols-2 gap-4">
+                  <input type="number" placeholder="Search" value={searchVal} onChange={(e) => setsearchVal(e.target.value)} className="bg-[#0f0d0a] border border-[#332b21] focus:border-emerald-500 text-[#EAEAEA] p-3 rounded-xl outline-none transition-all placeholder:text-[#5e5645]" />
                   <button onClick={searchElement2D} className="px-4 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 rounded-xl transition-all font-medium">Search 2D</button>
                 </div>
 
-                <div className="pt-4 border-t border-slate-800 grid grid-cols-4 gap-3">
-                  <input type="number" value={rows} onChange={(e) => setRows(Number(e.target.value))} className="bg-slate-950 border border-slate-800 focus:border-purple-500 text-slate-200 p-2.5 rounded-xl outline-none transition-all placeholder:text-slate-600 text-center" placeholder="Rows" />
-                  <input type="number" value={cols} onChange={(e) => setCols(Number(e.target.value))} className="bg-slate-950 border border-slate-800 focus:border-purple-500 text-slate-200 p-2.5 rounded-xl outline-none transition-all placeholder:text-slate-600 text-center" placeholder="Cols" />
-                  <input type="number" value={fillValue} onChange={(e) => setFillValue(e.target.value)} className="bg-slate-950 border border-slate-800 focus:border-purple-500 text-slate-200 p-2.5 rounded-xl outline-none transition-all placeholder:text-slate-600 text-center" placeholder="Fill" />
-                  <button onClick={create2Darray} className="px-2 py-2.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 border border-purple-500/30 rounded-xl transition-all font-medium text-xs">Create Grid</button>
+                <div className="pt-4 border-t border-[#332b21] grid grid-cols-4 gap-3">
+                  <input type="number" value={rows} onChange={(e) => setRows(Number(e.target.value))} className="bg-[#0f0d0a] border border-[#332b21] focus:border-amber-500 text-[#EAEAEA] p-2.5 rounded-xl outline-none transition-all placeholder:text-[#5e5645] text-center" placeholder="Rows" />
+                  <input type="number" value={cols} onChange={(e) => setCols(Number(e.target.value))} className="bg-[#0f0d0a] border border-[#332b21] focus:border-amber-500 text-[#EAEAEA] p-2.5 rounded-xl outline-none transition-all placeholder:text-[#5e5645] text-center" placeholder="Cols" />
+                  <input type="number" value={fillValue} onChange={(e) => setFillValue(e.target.value)} className="bg-[#0f0d0a] border border-[#332b21] focus:border-amber-500 text-[#EAEAEA] p-2.5 rounded-xl outline-none transition-all placeholder:text-[#5e5645] text-center" placeholder="Fill" />
+                  <button onClick={create2Darray} className="px-2 py-2.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 rounded-xl transition-all font-medium text-xs">Create Grid</button>
                 </div>
               </div>
             )}
@@ -626,10 +626,10 @@ export default function ArrayVisualizer() {
             <div className={`p-4 rounded-xl border flex items-center justify-center text-sm font-medium animate-in fade-in slide-in-from-bottom-2 ${
               complete 
                 ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" 
-                : "bg-blue-500/10 border-blue-500/30 text-blue-400"
+                : "bg-yellow-500/10 border-yellow-500/30 text-yellow-400"
             }`}>
               {complete ? "🎉 Visualization complete!" : message}
-              {operation && !complete && <span className="ml-2 px-2 py-0.5 bg-slate-900 rounded-md text-slate-500 text-xs border border-slate-800 uppercase">{operation}</span>}
+              {operation && !complete && <span className="ml-2 px-2 py-0.5 bg-[#1a1611] rounded-md text-[#7a7260] text-xs border border-[#332b21] uppercase">{operation}</span>}
             </div>
           )}
         </div>

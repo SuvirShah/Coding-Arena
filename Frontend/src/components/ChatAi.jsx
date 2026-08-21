@@ -8,7 +8,7 @@ function ChatAi({problem}) {
         { role: 'model', parts:[{text: `Hi! I'm your AI assistant. How can I help you with "${problem?.title || 'this problem'}"?`}]}
     ]);
 
-    const { register, handleSubmit, reset,formState: {errors} } = useForm();
+    const { register, handleSubmit, reset, formState: {errors} } = useForm();
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
@@ -53,14 +53,18 @@ function ChatAi({problem}) {
     };
 
     return (
-        <div className="flex flex-col h-screen max-h-[80vh] min-h-500px">
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex flex-col h-full min-h-[450px]">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
                 {messages.map((msg, index) => (
                     <div 
                         key={index} 
                         className={`chat ${msg.role === "user" ? "chat-end" : "chat-start"}`}
                     >
-                        <div className="chat-bubble bg-base-200 text-base-content">
+                        <div className={`chat-bubble text-xs sm:text-sm leading-relaxed p-3.5 rounded-xl border ${
+                            msg.role === "user" 
+                                ? "bg-[#ffd700] text-black font-medium border-[#ffd700]" 
+                                : "bg-[#181614] text-[#f0f0f0] border-[#382e1e]"
+                        }`}>
                             {msg.parts[0].text}
                         </div>
                     </div>
@@ -69,20 +73,20 @@ function ChatAi({problem}) {
             </div>
             <form 
                 onSubmit={handleSubmit(onSubmit)} 
-                className="sticky bottom-0 p-4 bg-base-100 border-t"
+                className="sticky bottom-0 p-3 bg-[#181614] border-t border-[#382e1e]"
             >
-                <div className="flex items-center">
+                <div className="flex items-center gap-2">
                     <input 
-                        placeholder="Ask me anything" 
-                        className="input input-bordered flex-1" 
+                        placeholder="Ask about time complexity, edge cases, hints..." 
+                        className="input input-sm bg-[#0c0b0a] border border-[#382e1e] focus:border-[#ffd700] focus:outline-none rounded-lg flex-1 text-[#f0f0f0] text-xs placeholder:text-[#a09a8e]/60" 
                         {...register("message", { required: true, minLength: 2 })}
                     />
                     <button 
                         type="submit" 
-                        className="btn btn-ghost ml-2"
+                        className="btn btn-sm rounded-lg bg-[#ffd700] hover:bg-[#e6c200] text-black border-none transition-all duration-200"
                         disabled={errors.message}
                     >
-                        <Send size={20} />
+                        <Send size={15} />
                     </button>
                 </div>
             </form>

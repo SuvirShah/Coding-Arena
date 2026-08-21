@@ -341,12 +341,12 @@ function slidingWindow(arr, condition):
   const visualizerPath = visualizerRoutes[id];
 
   return (
-    <article className="text-slate-300 font-sans pb-24 antialiased">
+    <article className="text-[#EAEAEA] font-sans pb-24 antialiased">
       
       {/* 1. HERO HEADER AREA */}
       <header className="mb-14">
         <div className="flex flex-wrap gap-2 mb-6">
-          <span className="px-3 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold uppercase tracking-widest rounded-full shadow-sm">
+          <span className="px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-widest rounded-full shadow-sm">
             {data.category}
           </span>
           <span className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-widest rounded-full shadow-sm">
@@ -356,7 +356,7 @@ function slidingWindow(arr, condition):
         <h1 className="text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight">
           {data.title}
         </h1>
-        <p className="text-xl lg:text-2xl text-slate-400 font-light leading-relaxed max-w-4xl border-l-4 border-purple-500 pl-6 py-2">
+        <p className="text-xl lg:text-2xl text-[#a09880] font-light leading-relaxed max-w-4xl border-l-4 border-yellow-500 pl-6 py-2">
           {data.summary}
         </p>
       </header>
@@ -366,26 +366,26 @@ function slidingWindow(arr, condition):
         <section className="mb-14">
           <Link
             to={visualizerPath}
-            className="group relative flex items-center justify-between w-full p-8 rounded-3xl border-2 border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent hover:border-emerald-400/60 hover:from-emerald-500/20 hover:via-emerald-500/10 transition-all duration-500 shadow-xl hover:shadow-[0_0_40px_rgba(16,185,129,0.15)] overflow-hidden"
+            className="group relative flex items-center justify-between w-full p-8 rounded-3xl border-2 border-yellow-500/30 bg-gradient-to-r from-yellow-500/10 via-yellow-500/5 to-transparent hover:border-yellow-400/60 hover:from-yellow-500/20 hover:via-yellow-500/10 transition-all duration-500 shadow-xl hover:shadow-[0_0_40px_rgba(255,215,0,0.15)] overflow-hidden"
           >
             {/* Animated background glow */}
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
             <div className="relative z-10 flex items-center gap-6">
-              <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-3xl group-hover:scale-110 group-hover:bg-emerald-500/30 transition-all duration-300 shadow-lg">
+              <div className="w-16 h-16 rounded-2xl bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center text-3xl text-yellow-400 group-hover:scale-110 group-hover:bg-yellow-500/30 transition-all duration-300 shadow-lg">
                 ▶
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white mb-1 group-hover:text-emerald-200 transition-colors">
+                <h2 className="text-2xl font-bold text-white mb-1 group-hover:text-yellow-200 transition-colors">
                   Open Interactive Visualizer
                 </h2>
-                <p className="text-slate-400 text-base group-hover:text-slate-300 transition-colors">
+                <p className="text-[#a09880] text-base group-hover:text-[#EAEAEA] transition-colors">
                   Step through the algorithm with animated bars, controls, and real-time status updates
                 </p>
               </div>
             </div>
 
-            <div className="relative z-10 flex items-center gap-2 text-emerald-400 group-hover:text-emerald-300 transition-colors">
+            <div className="relative z-10 flex items-center gap-2 text-yellow-400 group-hover:text-yellow-300 transition-colors">
               <span className="text-sm font-bold uppercase tracking-wider hidden sm:block">Launch</span>
               <svg className="w-8 h-8 group-hover:translate-x-2 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -398,12 +398,12 @@ function slidingWindow(arr, condition):
       <div className="space-y-16">
         
         {/* 2. INTUITION */}
-        <section className="bg-[#111827] rounded-3xl p-8 shadow-xl border border-slate-800/60 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+        <section className="bg-[#1a1611] rounded-3xl p-8 shadow-xl border border-[#332b21] relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
           <h2 className="text-xl font-bold text-white mb-5 flex items-center relative z-10">
-            <span className="text-purple-500 mr-3 text-2xl">💡</span> Core Intuition
+            <span className="text-amber-500 mr-3 text-2xl">💡</span> Core Intuition
           </h2>
-          <p className="text-slate-300 leading-relaxed text-lg relative z-10">{data.intuition}</p>
+          <p className="text-[#EAEAEA] leading-relaxed text-lg relative z-10">{data.intuition}</p>
         </section>
 
         {/* 3. APPROACH */}
@@ -413,11 +413,11 @@ function slidingWindow(arr, condition):
           </h2>
           <ol className="space-y-4">
             {data.approach.map((step, index) => (
-              <li key={index} className="flex bg-[#111827] p-6 rounded-2xl border border-slate-800/60 shadow-lg">
-                <span className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center font-bold text-lg mr-5 shadow-sm">
+              <li key={index} className="flex bg-[#1a1611] p-6 rounded-2xl border border-[#332b21] shadow-lg">
+                <span className="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 flex items-center justify-center font-bold text-lg mr-5 shadow-sm">
                   {index + 1}
                 </span>
-                <p className="text-slate-300 text-lg pt-1.5 leading-relaxed">{step}</p>
+                <p className="text-[#EAEAEA] text-lg pt-1.5 leading-relaxed">{step}</p>
               </li>
             ))}
           </ol>
@@ -427,16 +427,16 @@ function slidingWindow(arr, condition):
         <section>
           <h2 className="text-3xl font-bold text-white mb-8">Complexity</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-[#111827] rounded-3xl p-8 border border-slate-800/60 text-center shadow-xl">
-              <h3 className="text-xs font-extrabold text-slate-500 uppercase tracking-widest mb-4">Time Complexity</h3>
-              <p className="text-4xl font-mono text-blue-400 font-bold">{data.timeComplexity}</p>
+            <div className="bg-[#1a1611] rounded-3xl p-8 border border-[#332b21] text-center shadow-xl">
+              <h3 className="text-xs font-extrabold text-[#7a7260] uppercase tracking-widest mb-4">Time Complexity</h3>
+              <p className="text-4xl font-mono text-yellow-400 font-bold">{data.timeComplexity}</p>
             </div>
-            <div className="bg-[#111827] rounded-3xl p-8 border border-slate-800/60 text-center shadow-xl">
-              <h3 className="text-xs font-extrabold text-slate-500 uppercase tracking-widest mb-4">Space Complexity</h3>
-              <p className="text-4xl font-mono text-purple-400 font-bold">{data.spaceComplexity}</p>
+            <div className="bg-[#1a1611] rounded-3xl p-8 border border-[#332b21] text-center shadow-xl">
+              <h3 className="text-xs font-extrabold text-[#7a7260] uppercase tracking-widest mb-4">Space Complexity</h3>
+              <p className="text-4xl font-mono text-amber-400 font-bold">{data.spaceComplexity}</p>
             </div>
-            <div className="bg-[#111827] rounded-3xl p-8 border border-slate-800/60 text-center shadow-xl">
-              <h3 className="text-xs font-extrabold text-slate-500 uppercase tracking-widest mb-4">Best Case Time</h3>
+            <div className="bg-[#1a1611] rounded-3xl p-8 border border-[#332b21] text-center shadow-xl">
+              <h3 className="text-xs font-extrabold text-[#7a7260] uppercase tracking-widest mb-4">Best Case Time</h3>
               <p className="text-2xl font-mono text-emerald-400 font-bold mt-2">{data.bestCase}</p>
             </div>
           </div>
@@ -455,9 +455,9 @@ function slidingWindow(arr, condition):
               {data.pros.length > 0 ? data.pros.map((item, i) => (
                 <li key={i} className="flex items-start">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2.5 mr-4 flex-shrink-0"></div>
-                  <span className="text-slate-300 text-lg leading-relaxed">{item}</span>
+                  <span className="text-[#EAEAEA] text-lg leading-relaxed">{item}</span>
                 </li>
-              )) : <li className="text-slate-500">No data available</li>}
+              )) : <li className="text-[#7a7260]">No data available</li>}
             </ul>
           </div>
           <div className="bg-rose-950/20 border border-rose-900/30 rounded-3xl p-10 shadow-lg">
@@ -471,49 +471,49 @@ function slidingWindow(arr, condition):
               {data.cons.length > 0 ? data.cons.map((item, i) => (
                 <li key={i} className="flex items-start">
                   <div className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-2.5 mr-4 flex-shrink-0"></div>
-                  <span className="text-slate-300 text-lg leading-relaxed">{item}</span>
+                  <span className="text-[#EAEAEA] text-lg leading-relaxed">{item}</span>
                 </li>
-              )) : <li className="text-slate-500">No data available</li>}
+              )) : <li className="text-[#7a7260]">No data available</li>}
             </ul>
           </div>
         </section>
 
         {/* 6. USAGE & INTERVIEW */}
-        <section className="bg-[#111827] rounded-3xl p-10 border border-slate-800/60 shadow-xl">
+        <section className="bg-[#1a1611] rounded-3xl p-10 border border-[#332b21] shadow-xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div>
               <h3 className="text-sm font-bold tracking-widest text-emerald-400 uppercase mb-4">Best Use Cases</h3>
               <ul className="space-y-3 mb-8">
                 {data.useCases.length > 0 ? data.useCases.map((item, i) => (
-                  <li key={i} className="text-slate-300 text-lg flex items-center before:content-[''] before:w-1.5 before:h-1.5 before:bg-emerald-500 before:rounded-full before:mr-3">
+                  <li key={i} className="text-[#EAEAEA] text-lg flex items-center before:content-[''] before:w-1.5 before:h-1.5 before:bg-emerald-500 before:rounded-full before:mr-3">
                     {item}
                   </li>
-                )) : <li className="text-slate-500">No data available</li>}
+                )) : <li className="text-[#7a7260]">No data available</li>}
               </ul>
               
-              <h3 className="text-sm font-bold tracking-widest text-blue-400 uppercase mb-4">Edge Cases to Consider</h3>
+              <h3 className="text-sm font-bold tracking-widest text-yellow-400 uppercase mb-4">Edge Cases to Consider</h3>
               <ul className="space-y-3">
                 {data.edgeCases.length > 0 ? data.edgeCases.map((item, i) => (
-                  <li key={i} className="text-slate-300 text-lg flex items-center before:content-[''] before:w-1.5 before:h-1.5 before:bg-blue-500 before:rounded-full before:mr-3">
+                  <li key={i} className="text-[#EAEAEA] text-lg flex items-center before:content-[''] before:w-1.5 before:h-1.5 before:bg-yellow-500 before:rounded-full before:mr-3">
                     {item}
                   </li>
-                )) : <li className="text-slate-500">No data available</li>}
+                )) : <li className="text-[#7a7260]">No data available</li>}
               </ul>
             </div>
             
-            <div className="border-l border-slate-800/80 pl-0 md:pl-12">
+            <div className="border-l border-[#332b21] pl-0 md:pl-12">
               <h3 className="text-sm font-bold tracking-widest text-amber-400 uppercase mb-4">Interview Relevance</h3>
-              <p className="text-slate-300 text-lg leading-relaxed bg-amber-500/5 p-4 rounded-xl border border-amber-500/10 mb-8">
+              <p className="text-[#EAEAEA] text-lg leading-relaxed bg-amber-500/5 p-4 rounded-xl border border-amber-500/10 mb-8">
                 {data.interview}
               </p>
 
-              <h3 className="text-sm font-bold tracking-widest text-purple-400 uppercase mb-4">Related Problems</h3>
+              <h3 className="text-sm font-bold tracking-widest text-amber-400 uppercase mb-4">Related Problems</h3>
               <div className="flex flex-wrap gap-3 mt-4">
                 {data.relatedProblems.length > 0 ? data.relatedProblems.map((item, i) => (
-                  <span key={i} className="px-4 py-2 bg-slate-800/50 text-slate-300 text-sm font-semibold rounded-lg border border-slate-700">
+                  <span key={i} className="px-4 py-2 bg-[#332b21]/50 text-[#EAEAEA] text-sm font-semibold rounded-lg border border-[#3d3326]">
                     {item}
                   </span>
-                )) : <span className="text-slate-500">No data available</span>}
+                )) : <span className="text-[#7a7260]">No data available</span>}
               </div>
             </div>
           </div>
@@ -527,7 +527,7 @@ function slidingWindow(arr, condition):
             </h3>
             <ul className="space-y-3 ml-2">
               {data.mistakes.map((m, i) => (
-                <li key={i} className="text-slate-300 text-lg flex items-start">
+                <li key={i} className="text-[#EAEAEA] text-lg flex items-start">
                   <span className="text-amber-500 mr-3 mt-0.5">•</span>
                   <span>{m}</span>
                 </li>
@@ -539,14 +539,14 @@ function slidingWindow(arr, condition):
         {/* 8. PSEUDOCODE */}
         <section>
           <h2 className="text-3xl font-bold text-white mb-8">Pseudocode</h2>
-          <div className="bg-[#0d1321] rounded-2xl border border-slate-700/60 overflow-hidden shadow-lg">
-            <div className="bg-[#111827] px-6 py-4 border-b border-slate-800/80 flex items-center gap-2">
+          <div className="bg-[#211c15] rounded-2xl border border-[#3d3326] overflow-hidden shadow-lg">
+            <div className="bg-[#1a1611] px-6 py-4 border-b border-[#332b21] flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-rose-500"></div>
               <div className="w-3 h-3 rounded-full bg-amber-500"></div>
               <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-              <span className="ml-4 text-xs font-extrabold font-mono text-slate-500 tracking-widest">algorithm.pseudo</span>
+              <span className="ml-4 text-xs font-extrabold font-mono text-[#7a7260] tracking-widest">algorithm.pseudo</span>
             </div>
-            <pre className="p-8 text-sm md:text-base font-mono text-blue-300 overflow-x-auto m-0 leading-relaxed">
+            <pre className="p-8 text-sm md:text-base font-mono text-yellow-300 overflow-x-auto m-0 leading-relaxed">
               <code>{data.pseudocode}</code>
             </pre>
           </div>
@@ -557,10 +557,10 @@ function slidingWindow(arr, condition):
           <section className="pt-4">
             <Link
               to={visualizerPath}
-              className="group flex items-center justify-center gap-4 w-full p-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 hover:border-emerald-500/40 transition-all duration-300"
+              className="group flex items-center justify-center gap-4 w-full p-6 rounded-2xl border border-yellow-500/20 bg-yellow-500/5 hover:bg-yellow-500/10 hover:border-yellow-500/40 transition-all duration-300"
             >
-              <span className="text-2xl">▶</span>
-              <span className="text-lg font-bold text-emerald-400 group-hover:text-emerald-300 transition-colors">
+              <span className="text-2xl text-yellow-400">▶</span>
+              <span className="text-lg font-bold text-yellow-400 group-hover:text-yellow-300 transition-colors">
                 Ready to see it in action? Launch the Interactive Visualizer →
               </span>
             </Link>

@@ -204,71 +204,71 @@ export default function BubbleSort() {
     const SetBarColor = (idx) => {
         if (sorted.includes(idx)) return 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]';
         if (comparing.includes(idx)) return 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]';
-        return 'bg-blue-500/80 border border-blue-400/50';
+        return 'bg-yellow-500/80 border border-yellow-400/50 shadow-[0_0_10px_rgba(255,215,0,0.2)]';
     };
 
     const MaxVal = Math.max(...array);
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-300 p-6 md:p-10 selection:bg-blue-500/30">
+        <div className="min-h-screen bg-[#0f0d0a] text-[#EAEAEA] p-6 md:p-10 selection:bg-yellow-500/30">
             <div className="max-w-7xl mx-auto space-y-8">
 
                 {/* Header */}
                 <div className="flex flex-col items-center justify-center text-center mb-8">
                     <div className="w-full flex justify-start mb-4">
-                        <Link to={"/visualizer/learn/algo/bubble-sort"} className="inline-flex items-center text-slate-400 hover:text-blue-400 font-medium transition-colors bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-800 hover:border-blue-500/30 backdrop-blur-md">
+                        <Link to={"/visualizer/learn/algo/bubble-sort"} className="inline-flex items-center text-[#a09880] hover:text-yellow-400 font-medium transition-colors bg-[#1a1611]/50 px-4 py-2 rounded-xl border border-[#332b21] hover:border-yellow-500/30 backdrop-blur-md">
                             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                             </svg>
                             Back to Dashboard
                         </Link>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 tracking-tight mb-4">
+                    <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-[#a09880] tracking-tight mb-4">
                         Bubble Sort
                     </h1>
-                    <p className="text-lg text-slate-400 font-light max-w-2xl">
+                    <p className="text-lg text-[#a09880] font-light max-w-2xl">
                         Watch how Bubble Sort iteratively compares adjacent elements and swaps them to bubble the highest values to the top.
                     </p>
                 </div>
 
                 {/* Control Panel */}
-                <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-wrap gap-6 items-center justify-between">
+                <div className="bg-[#1a1611]/50 backdrop-blur-xl border border-[#332b21] rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-wrap gap-6 items-center justify-between">
                     <div className="flex flex-wrap gap-3">
-                        <button onClick={StartVisualization} disabled={isPlaying || complete} className="px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:text-slate-500 disabled:shadow-none text-white rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.2)] font-semibold flex items-center justify-center min-w-[120px]">
+                        <button onClick={StartVisualization} disabled={isPlaying || complete} className="px-6 py-3 bg-[#FFD700] hover:bg-[#E6C200] disabled:bg-[#332b21] disabled:text-[#7a7260] disabled:shadow-none text-black font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(255,215,0,0.2)] flex items-center justify-center min-w-[120px]">
                             {algorithm.length === 0 ? "▶ Start" : "▶ Resume"}
                         </button>
                         <button onClick={PauseVisualization} disabled={!isPlaying} className="px-6 py-3 bg-amber-500/20 hover:bg-amber-500/30 disabled:opacity-50 disabled:cursor-not-allowed text-amber-400 border border-amber-500/30 rounded-xl transition-all font-semibold min-w-[120px]">
                             ⏸ Pause
                         </button>
-                        <button onClick={NextStep} disabled={isPlaying || currentStep >= algorithm.length} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-300 rounded-xl transition-all font-semibold">
+                        <button onClick={NextStep} disabled={isPlaying || currentStep >= algorithm.length} className="px-6 py-3 bg-[#332b21] hover:bg-[#3d3326] disabled:opacity-50 disabled:cursor-not-allowed text-[#EAEAEA] rounded-xl transition-all font-semibold">
                             Step ⏩
                         </button>
-                        <button onClick={handleResetVisualization} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-all font-semibold">
+                        <button onClick={handleResetVisualization} className="px-6 py-3 bg-[#332b21] hover:bg-[#3d3326] text-[#EAEAEA] rounded-xl transition-all font-semibold">
                             ↺ Reset
                         </button>
-                        <button onClick={generateRandomArray} disabled={isPlaying} className="px-6 py-3 bg-purple-500/20 hover:bg-purple-500/30 disabled:opacity-50 text-purple-400 border border-purple-500/30 rounded-xl transition-all font-semibold">
+                        <button onClick={generateRandomArray} disabled={isPlaying} className="px-6 py-3 bg-amber-500/20 hover:bg-amber-500/30 disabled:opacity-50 text-amber-400 border border-amber-500/30 rounded-xl transition-all font-semibold">
                             🎲 New Array
                         </button>
                     </div>
 
                     <div className="flex flex-col gap-2 w-full sm:w-auto">
-                        <div className="flex justify-between text-xs text-slate-400 font-medium px-1">
+                        <div className="flex justify-between text-xs text-[#a09880] font-medium px-1">
                             <span>Animation Speed</span>
                             <span className="font-mono">{2100 - speed}ms</span>
                         </div>
-                        <input type="range" min={100} max={2000} value={speed} onChange={(e) => dispatch(setSpeed(Number(e.target.value)))} className="w-full sm:w-48 accent-blue-500 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer" />
+                        <input type="range" min={100} max={2000} value={speed} onChange={(e) => dispatch(setSpeed(Number(e.target.value)))} className="w-full sm:w-48 accent-yellow-500 h-2 bg-[#332b21] rounded-lg appearance-none cursor-pointer" />
                     </div>
                 </div>
 
                 {/* Visualization Canvas */}
-                <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl min-h-[400px] flex flex-col justify-end relative overflow-hidden">
+                <div className="bg-[#1a1611]/50 backdrop-blur-xl border border-[#332b21] rounded-3xl p-8 shadow-2xl min-h-[400px] flex flex-col justify-end relative overflow-hidden">
                     {/* Decorative Grid Background */}
                     <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none"></div>
 
                     <div className="flex items-end justify-center gap-2 sm:gap-3 h-80 z-10 w-full overflow-x-auto pb-4">
                         {array.map((value, index) => (
                             <div key={index} className="flex flex-col items-center group">
-                                <div className="mb-3 text-sm font-bold text-slate-300 group-hover:-translate-y-1 transition-transform">
+                                <div className="mb-3 text-sm font-bold text-[#EAEAEA] group-hover:-translate-y-1 transition-transform">
                                     {value}
                                 </div>
                                 <div
@@ -278,7 +278,7 @@ export default function BubbleSort() {
                                         minHeight: '24px'
                                     }}
                                 />
-                                <div className="mt-3 text-xs font-mono text-slate-500">
+                                <div className="mt-3 text-xs font-mono text-[#7a7260]">
                                     [{index}]
                                 </div>
                             </div>
@@ -291,16 +291,16 @@ export default function BubbleSort() {
 
                     {/* Live Status & Legend */}
                     <div className="lg:col-span-2 space-y-6 flex flex-col">
-                        <div className={`flex-1 rounded-3xl p-6 sm:p-8 border shadow-xl transition-all duration-300 ${complete ? "bg-emerald-500/10 border-emerald-500/30" : "bg-slate-900/50 border-slate-800 backdrop-blur-xl"
+                        <div className={`flex-1 rounded-3xl p-6 sm:p-8 border shadow-xl transition-all duration-300 ${complete ? "bg-emerald-950/20 border-emerald-500/30" : "bg-[#1a1611]/50 border-[#332b21] backdrop-blur-xl"
                             }`}>
-                            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">💬 Live Algorithm Status</h3>
+                            <h3 className="text-sm font-semibold text-[#a09880] uppercase tracking-wider mb-4">💬 Live Algorithm Status</h3>
                             {algorithm.length > 0 && currentStep > 0 ? (
                                 <div className="space-y-4">
                                     <div className="flex items-start gap-3">
-                                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold border border-blue-500/30">
+                                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center font-bold border border-yellow-500/30">
                                             {currentStep}
                                         </div>
-                                        <p className="text-lg text-slate-200 pt-0.5 leading-relaxed">
+                                        <p className="text-lg text-[#EAEAEA] pt-0.5 leading-relaxed">
                                             {algorithm[currentStep - 1]?.description}
                                         </p>
                                     </div>
@@ -315,44 +315,44 @@ export default function BubbleSort() {
                                     )}
                                 </div>
                             ) : (
-                                <p className="text-slate-500 italic">Press Start to begin the visualization.</p>
+                                <p className="text-[#7a7260] italic">Press Start to begin the visualization.</p>
                             )}
                         </div>
 
-                        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 shadow-xl">
-                            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Color Legend</h3>
+                        <div className="bg-[#1a1611]/50 backdrop-blur-xl border border-[#332b21] rounded-3xl p-6 shadow-xl">
+                            <h3 className="text-sm font-semibold text-[#a09880] uppercase tracking-wider mb-4">Color Legend</h3>
                             <div className="flex flex-wrap gap-6">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-5 h-5 bg-blue-500/80 border border-blue-400/50 rounded-lg"></div>
-                                    <span className="text-slate-300 font-medium">Unsorted</span>
+                                    <div className="w-5 h-5 bg-yellow-500/80 border border-yellow-400/50 rounded-lg"></div>
+                                    <span className="text-[#EAEAEA] font-medium">Unsorted</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="w-5 h-5 bg-red-500 rounded-lg shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
-                                    <span className="text-slate-300 font-medium">Comparing/Swapping</span>
+                                    <span className="text-[#EAEAEA] font-medium">Comparing/Swapping</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="w-5 h-5 bg-emerald-500 rounded-lg shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
-                                    <span className="text-slate-300 font-medium">Sorted (Locked)</span>
+                                    <span className="text-[#EAEAEA] font-medium">Sorted (Locked)</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Documentation */}
-                    <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl">
-                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-6">📖 Algorithm Details</h3>
-                        <div className="text-slate-300 space-y-4 text-sm leading-relaxed">
-                            <div className="p-4 rounded-2xl bg-slate-800/50 border border-slate-700/50">
-                                <strong className="text-blue-400 block mb-1">Concept</strong>
+                    <div className="bg-[#1a1611]/50 backdrop-blur-xl border border-[#332b21] rounded-3xl p-6 sm:p-8 shadow-xl">
+                        <h3 className="text-sm font-semibold text-[#a09880] uppercase tracking-wider mb-6">📖 Algorithm Details</h3>
+                        <div className="text-[#EAEAEA] space-y-4 text-sm leading-relaxed">
+                            <div className="p-4 rounded-2xl bg-[#211c15] border border-[#332b21]">
+                                <strong className="text-yellow-400 block mb-1">Concept</strong>
                                 Compare adjacent elements and swap them if the left is greater. The largest unsorted element "bubbles" to its correct position.
                             </div>
-                            <div className="p-4 rounded-2xl bg-slate-800/50 border border-slate-700/50">
+                            <div className="p-4 rounded-2xl bg-[#211c15] border border-[#332b21]">
                                 <strong className="text-amber-400 block mb-1">Time Complexity</strong>
                                 O(n²) — Average & Worst Case<br />
                                 O(n) — Best Case (Already Sorted)
                             </div>
-                            <div className="p-4 rounded-2xl bg-slate-800/50 border border-slate-700/50">
-                                <strong className="text-purple-400 block mb-1">Space Complexity</strong>
+                            <div className="p-4 rounded-2xl bg-[#211c15] border border-[#332b21]">
+                                <strong className="text-amber-400 block mb-1">Space Complexity</strong>
                                 O(1) — Sorts in-place
                             </div>
                         </div>

@@ -1,2 +1,74 @@
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: codearena --default;
+}
+
+@plugin "daisyui/theme" {
+  name: "codearena";
+  default: true;
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: #181614;
+  --color-base-200: #0c0b0a;
+  --color-base-300: #382e1e;
+  --color-base-content: #f0f0f0;
+
+  --color-primary: #ffd700;
+  --color-primary-content: #000000;
+
+  --color-secondary: #f5a623;
+  --color-secondary-content: #000000;
+
+  --color-accent: #e6c200;
+  --color-accent-content: #000000;
+
+  --color-neutral: #211c15;
+  --color-neutral-content: #f0f0f0;
+
+  --color-info: #38bdf8;
+  --color-info-content: #002b3d;
+
+  --color-success: #22c55e;
+  --color-success-content: #000000;
+
+  --color-warning: #f59e0b;
+  --color-warning-content: #000000;
+
+  --color-error: #ef4444;
+  --color-error-content: #ffffff;
+
+  --rounded-box: 0.75rem;
+  --rounded-btn: 0.5rem;
+  --rounded-badge: 9999px;
+  --animation-btn: 0.2s;
+  --animation-input: 0.2s;
+  --btn-focus-scale: 0.98;
+  --border-btn: 1px;
+  --tab-border: 1px;
+  --tab-radius: 0.5rem;
+}
+
+/* Custom global scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0c0b0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #382e1e;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #50422d;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #382e1e #0c0b0a;
+}

@@ -107,7 +107,7 @@ export default function SlidingWindow() {
   };
 
   const getBlockStyle = (index) => {
-    if (!currentFrame) return "bg-slate-800/50 border-slate-700 text-slate-300";
+    if (!currentFrame) return "bg-[#332b21]/50 border-[#3d3326] text-[#EAEAEA]";
 
     const { windowStart, windowEnd, maxStart, addedIndex, removedIndex, type } = currentFrame;
     const k = parseInt(windowSize) || 0;
@@ -123,12 +123,12 @@ export default function SlidingWindow() {
       return "bg-rose-500/10 border-rose-500/30 text-rose-500/50 scale-95 opacity-50";
     }
     if (index >= windowStart && index <= windowEnd && windowStart >= 0) {
-      return "bg-blue-500/20 border-blue-400 text-blue-300 shadow-[0_0_15px_rgba(59,130,246,0.3)] z-10";
+      return "bg-yellow-500/20 border-yellow-400 text-yellow-300 shadow-[0_0_15px_rgba(255,215,0,0.3)] z-10";
     }
     if (index >= maxStart && index <= maxEnd && maxStart >= 0) {
       return "bg-emerald-500/10 border-emerald-400/50 text-emerald-300 ring-2 ring-emerald-400/50";
     }
-    return "bg-slate-800/50 border-slate-700 text-slate-300";
+    return "bg-[#332b21]/50 border-[#3d3326] text-[#EAEAEA]";
   };
 
   const getPointerLabel = (index) => {
@@ -137,59 +137,59 @@ export default function SlidingWindow() {
     const labels = [];
     if (index === addedIndex && addedIndex >= 0) labels.push({ text: "+", color: "text-amber-400 bg-amber-500/20 border border-amber-500/30" });
     if (index === removedIndex && removedIndex >= 0) labels.push({ text: "−", color: "text-rose-400 bg-rose-500/20 border border-rose-500/30" });
-    if (index === windowStart && windowStart >= 0) labels.push({ text: "W₁", color: "text-blue-400 bg-blue-500/20 border border-blue-500/30" });
-    if (index === windowEnd && windowEnd >= 0 && windowEnd !== windowStart) labels.push({ text: "W₂", color: "text-blue-400 bg-blue-500/20 border border-blue-500/30" });
+    if (index === windowStart && windowStart >= 0) labels.push({ text: "W₁", color: "text-yellow-400 bg-yellow-500/20 border border-yellow-500/30" });
+    if (index === windowEnd && windowEnd >= 0 && windowEnd !== windowStart) labels.push({ text: "W₂", color: "text-yellow-400 bg-yellow-500/20 border border-yellow-500/30" });
     return labels;
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-300 p-6 md:p-10 selection:bg-blue-500/30">
+    <div className="min-h-screen bg-[#0f0d0a] text-[#EAEAEA] p-6 md:p-10 selection:bg-yellow-500/30">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Header */}
         <div className="flex flex-col items-center justify-center text-center mb-8">
           <div className="w-full flex justify-start mb-4">
-            <Link to={"/visualizer"} className="inline-flex items-center text-slate-400 hover:text-blue-400 font-medium transition-colors bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-800 hover:border-blue-500/30 backdrop-blur-md">
+            <Link to={"/visualizer"} className="inline-flex items-center text-[#a09880] hover:text-yellow-400 font-medium transition-colors bg-[#1a1611]/50 px-4 py-2 rounded-xl border border-[#332b21] hover:border-yellow-500/30 backdrop-blur-md">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Back to Dashboard
             </Link>
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 tracking-tight mb-4">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-[#a09880] tracking-tight mb-4">
             Sliding Window Visualizer
           </h1>
-          <p className="text-lg text-slate-400 font-light max-w-2xl">
+          <p className="text-lg text-[#a09880] font-light max-w-2xl">
             Watch how the Sliding Window technique finds the maximum sum subarray of size K in O(n) time.
           </p>
         </div>
 
         {/* Configuration Panel */}
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
-          <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">⚙️ Configuration</h3>
+        <div className="bg-[#1a1611]/50 backdrop-blur-xl border border-[#332b21] rounded-3xl p-6 sm:p-8 shadow-2xl">
+          <h3 className="text-sm font-semibold text-[#a09880] uppercase tracking-wider mb-4">⚙️ Configuration</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-slate-500 mb-2">Array (comma-separated)</label>
+              <label className="block text-sm font-medium text-[#7a7260] mb-2">Array (comma-separated)</label>
               <div className="flex gap-3">
                 <input
                   type="text"
                   value={arrayInput}
                   onChange={(e) => setArrayInput(e.target.value)}
-                  className="flex-1 bg-slate-950 border border-slate-800 focus:border-violet-500 focus:ring-1 focus:ring-violet-500/50 text-slate-200 p-3 rounded-xl outline-none transition-all placeholder:text-slate-600"
+                  className="flex-1 bg-[#0f0d0a] border border-[#332b21] focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/50 text-[#EAEAEA] p-3 rounded-xl outline-none transition-all placeholder:text-[#5e5645]"
                   placeholder="e.g. 2, 1, 5, 1, 3, 2"
                 />
-                <button onClick={parseArrayInput} className="px-5 py-3 bg-violet-600/20 hover:bg-violet-600/30 text-violet-400 border border-violet-500/30 rounded-xl font-semibold transition-all">
+                <button onClick={parseArrayInput} className="px-5 py-3 bg-[#FFD700] hover:bg-[#E6C200] text-black font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(255,215,0,0.2)]">
                   Set Array
                 </button>
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-500 mb-2">Window Size K</label>
+              <label className="block text-sm font-medium text-[#7a7260] mb-2">Window Size K</label>
               <input
                 type="number"
                 value={windowSize}
                 onChange={(e) => setWindowSize(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 focus:border-fuchsia-500 focus:ring-1 focus:ring-fuchsia-500/50 text-slate-200 p-3 rounded-xl outline-none transition-all placeholder:text-slate-600"
+                className="w-full bg-[#0f0d0a] border border-[#332b21] focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 text-[#EAEAEA] p-3 rounded-xl outline-none transition-all placeholder:text-[#5e5645]"
                 placeholder="Enter window size"
                 min={1}
                 max={array.length}
@@ -199,40 +199,40 @@ export default function SlidingWindow() {
         </div>
 
         {/* Control Panel */}
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-wrap gap-6 items-center justify-between">
+        <div className="bg-[#1a1611]/50 backdrop-blur-xl border border-[#332b21] rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-wrap gap-6 items-center justify-between">
           <div className="flex flex-wrap gap-3">
-            <button onClick={startVisualization} disabled={isPlaying || complete || !windowSize} className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-500 disabled:shadow-none text-white rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] font-semibold flex items-center justify-center min-w-[120px]">
+            <button onClick={startVisualization} disabled={isPlaying || complete || !windowSize} className="px-6 py-3 bg-[#FFD700] hover:bg-[#E6C200] disabled:bg-[#332b21] disabled:text-[#7a7260] disabled:shadow-none text-black font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(255,215,0,0.2)] flex items-center justify-center min-w-[120px]">
               {algorithm.length === 0 ? "▶ Start" : "▶ Resume"}
             </button>
             <button onClick={() => { setIsPlaying(false); if (timeoutRef.current) clearTimeout(timeoutRef.current); }} disabled={!isPlaying} className="px-6 py-3 bg-amber-500/20 hover:bg-amber-500/30 disabled:opacity-50 disabled:cursor-not-allowed text-amber-400 border border-amber-500/30 rounded-xl transition-all font-semibold min-w-[120px]">
               ⏸ Pause
             </button>
-            <button onClick={prevStep} disabled={isPlaying || currentStep <= 0} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-300 rounded-xl transition-all font-semibold">
+            <button onClick={prevStep} disabled={isPlaying || currentStep <= 0} className="px-6 py-3 bg-[#332b21] hover:bg-[#3d3326] disabled:opacity-50 disabled:cursor-not-allowed text-[#EAEAEA] rounded-xl transition-all font-semibold">
               ⏪ Prev
             </button>
-            <button onClick={nextStep} disabled={isPlaying || (algorithm.length > 0 && currentStep >= algorithm.length)} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-300 rounded-xl transition-all font-semibold">
+            <button onClick={nextStep} disabled={isPlaying || (algorithm.length > 0 && currentStep >= algorithm.length)} className="px-6 py-3 bg-[#332b21] hover:bg-[#3d3326] disabled:opacity-50 disabled:cursor-not-allowed text-[#EAEAEA] rounded-xl transition-all font-semibold">
               Next ⏩
             </button>
-            <button onClick={resetVisualization} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-all font-semibold">
+            <button onClick={resetVisualization} className="px-6 py-3 bg-[#332b21] hover:bg-[#3d3326] text-[#EAEAEA] rounded-xl transition-all font-semibold">
               ↺ Reset
             </button>
-            <button onClick={generateRandomArray} disabled={isPlaying} className="px-6 py-3 bg-purple-500/20 hover:bg-purple-500/30 disabled:opacity-50 text-purple-400 border border-purple-500/30 rounded-xl transition-all font-semibold">
+            <button onClick={generateRandomArray} disabled={isPlaying} className="px-6 py-3 bg-amber-500/20 hover:bg-amber-500/30 disabled:opacity-50 text-amber-400 border border-amber-500/30 rounded-xl transition-all font-semibold">
               🎲 Random Array
             </button>
           </div>
 
           <div className="flex flex-col gap-2 w-full sm:w-auto">
-            <div className="flex justify-between text-xs text-slate-400 font-medium px-1">
+            <div className="flex justify-between text-xs text-[#a09880] font-medium px-1">
               <span>Animation Speed</span>
               <span className="font-mono">{speed}ms</span>
             </div>
-            <input type="range" min={200} max={2000} step={100} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} className="w-full sm:w-48 accent-violet-500 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer" />
+            <input type="range" min={200} max={2000} step={100} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} className="w-full sm:w-48 accent-yellow-500 h-2 bg-[#332b21] rounded-lg appearance-none cursor-pointer" />
           </div>
         </div>
 
         {/* Visualization Canvas */}
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl min-h-[300px] flex flex-col justify-center relative overflow-hidden">
-          <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-8 text-center">
+        <div className="bg-[#1a1611]/50 backdrop-blur-xl border border-[#332b21] rounded-3xl p-8 shadow-2xl min-h-[300px] flex flex-col justify-center relative overflow-hidden">
+          <h3 className="text-sm font-semibold text-[#a09880] uppercase tracking-wider mb-8 text-center">
             {currentFrame ? `Step ${currentStep} of ${algorithm.length}` : "Array Visualization"}
           </h3>
 
@@ -254,7 +254,7 @@ export default function SlidingWindow() {
                     {value}
                   </div>
                   {/* Index */}
-                  <div className="text-[10px] text-slate-500 mt-2 font-mono">[{index}]</div>
+                  <div className="text-[10px] text-[#7a7260] mt-2 font-mono">[{index}]</div>
                 </div>
               );
             })}
@@ -263,10 +263,10 @@ export default function SlidingWindow() {
           {/* Window bracket indicator */}
           {currentFrame && currentFrame.windowStart >= 0 && (
             <div className="mt-8 flex justify-center w-full">
-              <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl px-6 py-3 text-sm flex items-center gap-3">
-                <span className="font-semibold text-blue-400 tracking-wider uppercase text-xs">Current Window:</span>
-                <span className="text-blue-300 font-mono text-lg tracking-widest">[{array.slice(currentFrame.windowStart, currentFrame.windowEnd + 1).join(", ")}]</span>
-                <span className="text-blue-400 font-bold ml-2 text-xl">= {currentFrame.currentSum}</span>
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl px-6 py-3 text-sm flex items-center gap-3">
+                <span className="font-semibold text-yellow-400 tracking-wider uppercase text-xs">Current Window:</span>
+                <span className="text-yellow-300 font-mono text-lg tracking-widest">[{array.slice(currentFrame.windowStart, currentFrame.windowEnd + 1).join(", ")}]</span>
+                <span className="text-yellow-400 font-bold ml-2 text-xl">= {currentFrame.currentSum}</span>
               </div>
             </div>
           )}
@@ -280,46 +280,46 @@ export default function SlidingWindow() {
 
             {/* Stats Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-center shadow-lg">
-                <div className="text-[10px] text-blue-400 font-semibold uppercase tracking-wider mb-1">Window</div>
-                <div className="text-2xl font-bold text-slate-200">
+              <div className="bg-[#1a1611]/50 border border-[#332b21] rounded-2xl p-4 text-center shadow-lg">
+                <div className="text-[10px] text-yellow-400 font-semibold uppercase tracking-wider mb-1">Window</div>
+                <div className="text-2xl font-bold text-[#EAEAEA]">
                   {currentFrame ? `[${currentFrame.windowStart}..${currentFrame.windowEnd}]` : "—"}
                 </div>
               </div>
-              <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-center shadow-lg">
-                <div className="text-[10px] text-violet-400 font-semibold uppercase tracking-wider mb-1">Current Sum</div>
-                <div className="text-2xl font-bold text-slate-200">{currentFrame ? currentFrame.currentSum : "—"}</div>
+              <div className="bg-[#1a1611]/50 border border-[#332b21] rounded-2xl p-4 text-center shadow-lg">
+                <div className="text-[10px] text-amber-400 font-semibold uppercase tracking-wider mb-1">Current Sum</div>
+                <div className="text-2xl font-bold text-[#EAEAEA]">{currentFrame ? currentFrame.currentSum : "—"}</div>
               </div>
-              <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-center shadow-lg">
+              <div className="bg-[#1a1611]/50 border border-[#332b21] rounded-2xl p-4 text-center shadow-lg">
                 <div className="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider mb-1">Max Sum</div>
-                <div className="text-2xl font-bold text-slate-200">{currentFrame ? currentFrame.maxSum : "—"}</div>
+                <div className="text-2xl font-bold text-[#EAEAEA]">{currentFrame ? currentFrame.maxSum : "—"}</div>
               </div>
-              <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-center shadow-lg flex flex-col justify-center">
+              <div className="bg-[#1a1611]/50 border border-[#332b21] rounded-2xl p-4 text-center shadow-lg flex flex-col justify-center">
                 <div className="text-[10px] text-amber-400 font-semibold uppercase tracking-wider mb-1">Phase</div>
-                <div className="text-lg font-bold text-slate-200">
+                <div className="text-lg font-bold text-[#EAEAEA]">
                   {currentFrame?.type === "build_window" ? "Building 🔨" : currentFrame?.type === "window_ready" ? "Ready ✅" : currentFrame?.type === "slide" ? "Sliding ➡️" : currentFrame?.type === "new_max" ? "New Max 🏆" : currentFrame?.type === "completed" ? "Done ✅" : "—"}
                 </div>
               </div>
             </div>
 
             {/* Status Box */}
-            <div className={`flex-1 rounded-3xl p-6 sm:p-8 border shadow-xl transition-all duration-300 ${currentFrame?.type === "completed" ? "bg-emerald-500/10 border-emerald-500/30"
-                : currentFrame?.type === "new_max" ? "bg-amber-500/10 border-amber-500/30"
-                  : currentFrame?.type === "error" ? "bg-rose-500/10 border-rose-500/30"
-                    : currentFrame?.type === "build_window" ? "bg-violet-500/10 border-violet-500/30"
-                      : "bg-slate-900/50 border-slate-800 backdrop-blur-xl"
+            <div className={`flex-1 rounded-3xl p-6 sm:p-8 border shadow-xl transition-all duration-300 ${currentFrame?.type === "completed" ? "bg-emerald-950/20 border-emerald-500/30"
+                : currentFrame?.type === "new_max" ? "bg-amber-950/20 border-amber-500/30"
+                  : currentFrame?.type === "error" ? "bg-rose-950/20 border-rose-500/30"
+                    : currentFrame?.type === "build_window" ? "bg-yellow-500/10 border-yellow-500/30"
+                      : "bg-[#1a1611]/50 border-[#332b21] backdrop-blur-xl"
               }`}>
-              <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">💬 Live Algorithm Status</h3>
+              <h3 className="text-sm font-semibold text-[#a09880] uppercase tracking-wider mb-4">💬 Live Algorithm Status</h3>
               {currentFrame ? (
                 <p className={`text-lg pt-0.5 leading-relaxed font-medium ${currentFrame.type === "completed" ? "text-emerald-400"
                     : currentFrame.type === "new_max" ? "text-amber-400"
                       : currentFrame.type === "error" ? "text-rose-400"
-                        : "text-blue-400"
+                        : "text-yellow-400"
                   }`}>
                   {currentFrame.description}
                 </p>
               ) : (
-                <p className="text-slate-500 italic">Press Start to begin the visualization.</p>
+                <p className="text-[#7a7260] italic">Press Start to begin the visualization.</p>
               )}
             </div>
 
@@ -327,41 +327,41 @@ export default function SlidingWindow() {
 
           {/* Legend & Docs */}
           <div className="space-y-6">
-            <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 shadow-xl">
-              <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Color Legend</h3>
+            <div className="bg-[#1a1611]/50 backdrop-blur-xl border border-[#332b21] rounded-3xl p-6 shadow-xl">
+              <h3 className="text-sm font-semibold text-[#a09880] uppercase tracking-wider mb-4">Color Legend</h3>
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-blue-500/20 border-2 border-blue-400 rounded"></div>
-                  <span className="text-slate-300 text-sm font-medium">Active Window</span>
+                  <div className="w-5 h-5 bg-yellow-500/20 border-2 border-yellow-400 rounded"></div>
+                  <span className="text-[#EAEAEA] text-sm font-medium">Active Window</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-5 h-5 bg-amber-500/20 border-2 border-amber-400 rounded"></div>
-                  <span className="text-slate-300 text-sm font-medium">Element Being Added</span>
+                  <span className="text-[#EAEAEA] text-sm font-medium">Element Being Added</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-5 h-5 bg-rose-500/10 border-2 border-rose-500/30 rounded opacity-50"></div>
-                  <span className="text-slate-500 text-sm font-medium">Element Being Removed</span>
+                  <span className="text-[#7a7260] text-sm font-medium">Element Being Removed</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-5 h-5 bg-emerald-500/20 border-2 border-emerald-400 rounded"></div>
-                  <span className="text-slate-300 text-sm font-medium">Best Window (Final)</span>
+                  <span className="text-[#EAEAEA] text-sm font-medium">Best Window (Final)</span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 shadow-xl">
-              <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">📖 Algorithm Details</h3>
-              <div className="text-slate-300 space-y-3 text-sm leading-relaxed">
-                <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
-                  <strong className="text-violet-400 block mb-0.5">Slide & Track</strong>
+            <div className="bg-[#1a1611]/50 backdrop-blur-xl border border-[#332b21] rounded-3xl p-6 shadow-xl">
+              <h3 className="text-sm font-semibold text-[#a09880] uppercase tracking-wider mb-4">📖 Algorithm Details</h3>
+              <div className="text-[#EAEAEA] space-y-3 text-sm leading-relaxed">
+                <div className="p-3 rounded-xl bg-[#211c15] border border-[#332b21]">
+                  <strong className="text-yellow-400 block mb-0.5">Slide & Track</strong>
                   Move window one position right: subtract leftmost, add next element.
                 </div>
-                <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
+                <div className="p-3 rounded-xl bg-[#211c15] border border-[#332b21]">
                   <strong className="text-amber-400 block mb-0.5">Time Complexity</strong>
                   O(n) — Each slide is O(1) by reusing previous sum.
                 </div>
-                <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
-                  <strong className="text-purple-400 block mb-0.5">Space Complexity</strong>
+                <div className="p-3 rounded-xl bg-[#211c15] border border-[#332b21]">
+                  <strong className="text-amber-400 block mb-0.5">Space Complexity</strong>
                   O(1) — Only keeps track of pointers and sums.
                 </div>
               </div>

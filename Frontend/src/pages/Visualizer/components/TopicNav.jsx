@@ -60,10 +60,10 @@ export default function TopicNav({ mode }) {
     const base = "block px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border border-transparent";
     if (isActive) {
       return type === 'ds' 
-        ? `${base} bg-blue-600/10 text-blue-400 border-blue-500/20 shadow-[0_0_15px_rgba(37,99,235,0.05)]`
-        : `${base} bg-purple-600/10 text-purple-400 border-purple-500/20 shadow-[0_0_15px_rgba(124,58,237,0.05)]`;
+        ? `${base} bg-yellow-500/10 text-yellow-400 border-yellow-500/20 shadow-[0_0_15px_rgba(255,215,0,0.05)]`
+        : `${base} bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-[0_0_15px_rgba(245,166,35,0.05)]`;
     }
-    return `${base} text-slate-400 hover:text-slate-200 hover:bg-slate-800/40`;
+    return `${base} text-[#a09880] hover:text-[#EAEAEA] hover:bg-[#332b21]/40`;
   };
 
   // Data Structures Mode
@@ -88,7 +88,7 @@ export default function TopicNav({ mode }) {
         <div key={group.category} className="space-y-2">
           <button 
             onClick={() => toggleCategory(group.category)}
-            className="w-full flex items-center justify-between px-2 text-[11px] font-extrabold text-slate-500 uppercase tracking-widest hover:text-slate-300 transition-colors"
+            className="w-full flex items-center justify-between px-2 text-[11px] font-extrabold text-[#a09880] uppercase tracking-widest hover:text-[#EAEAEA] transition-colors"
           >
             {group.category}
             <svg 

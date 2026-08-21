@@ -133,54 +133,54 @@ export default function BFS() {
   }, [isPlaying, currentStep, algorithm, speed]);
 
   const getNodeStyle = (node) => {
-    if (node.isStart) return "bg-green-500 scale-110 shadow-lg shadow-green-300 ring-2 ring-green-400 z-10";
-    if (node.isEnd) return "bg-red-500 scale-110 shadow-lg shadow-red-300 ring-2 ring-red-400 z-10";
-    if (node.isWall) return "bg-slate-700 scale-105 rounded-sm";
-    if (node.isPath) return "bg-yellow-400 scale-105 shadow-md ring-1 ring-yellow-500";
-    if (node.isVisited) return "bg-blue-300 animate-pulse";
-    return "bg-slate-100 border border-slate-200 hover:bg-slate-200";
+    if (node.isStart) return "bg-emerald-500 scale-110 shadow-lg shadow-emerald-900 ring-2 ring-emerald-400 z-10";
+    if (node.isEnd) return "bg-rose-500 scale-110 shadow-lg shadow-rose-900 ring-2 ring-rose-400 z-10";
+    if (node.isWall) return "bg-[#524433] scale-105 rounded-sm";
+    if (node.isPath) return "bg-[#FFD700] scale-105 shadow-md ring-1 ring-yellow-300";
+    if (node.isVisited) return "bg-yellow-500/40 animate-pulse";
+    return "bg-[#1a1611] border border-[#2a2318] hover:bg-[#251e15]";
   };
 
   return (
     <div 
-      className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-indigo-100 p-8"
+      className="min-h-screen bg-[#0f0d0a] text-[#EAEAEA] p-8 selection:bg-yellow-500/30"
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <Link to="/visualizer" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4 font-medium transition-colors">
+        <Link to="/visualizer" className="inline-flex items-center text-yellow-400 hover:text-yellow-300 mb-4 font-medium transition-colors">
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Back to Home
         </Link>
-        <h1 className="text-4xl font-bold text-gray-800 mb-2">📡 Breadth-First Search (BFS) Visualizer</h1>
-        <p className="text-gray-500 text-lg mb-8">
+        <h1 className="text-4xl font-bold text-white mb-2">📡 Breadth-First Search (BFS) Visualizer</h1>
+        <p className="text-[#a09880] text-lg mb-8">
           Draw walls by clicking and dragging on the grid. BFS guarantees the shortest path on an unweighted grid!
         </p>
 
         {/* Controls */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6 border border-white/40">
+        <div className="bg-[#1a1611]/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6 border border-[#332b21]">
           <div className="flex flex-wrap gap-4 items-center justify-between">
             <div className="flex flex-wrap gap-3">
-              <button onClick={startVisualization} disabled={isPlaying || complete} className="bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-md">
+              <button onClick={startVisualization} disabled={isPlaying || complete} className="bg-[#FFD700] hover:bg-[#E6C200] disabled:bg-[#332b21] disabled:text-[#7a7260] text-black px-5 py-2.5 rounded-xl font-bold transition-all shadow-md">
                 ▶ Start BFS
               </button>
-              <button onClick={() => { setIsPlaying(false); if (timeoutRef.current) clearTimeout(timeoutRef.current); }} disabled={!isPlaying} className="bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-md">
+              <button onClick={() => { setIsPlaying(false); if (timeoutRef.current) clearTimeout(timeoutRef.current); }} disabled={!isPlaying} className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 disabled:opacity-50 disabled:cursor-not-allowed px-5 py-2.5 rounded-xl font-semibold transition-all shadow-md">
                 ⏸ Pause
               </button>
-              <button onClick={resetVisualization} className="bg-slate-500 hover:bg-slate-600 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-md">
+              <button onClick={resetVisualization} className="bg-[#332b21] hover:bg-[#3d3326] text-[#EAEAEA] px-5 py-2.5 rounded-xl font-semibold transition-all shadow-md">
                 ↺ Reset Search
               </button>
-              <button onClick={clearBoard} disabled={isPlaying} className="bg-rose-500 hover:bg-rose-600 disabled:bg-gray-300 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-md">
+              <button onClick={clearBoard} disabled={isPlaying} className="bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 disabled:opacity-50 px-5 py-2.5 rounded-xl font-semibold transition-all shadow-md">
                 🗑️ Clear Board (Remove Walls)
               </button>
             </div>
             <div className="flex items-center gap-3">
-              <label className="text-sm font-semibold text-gray-600">Speed</label>
-              <input type="range" min={10} max={500} step={10} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} className="w-28 accent-blue-500" dir="rtl" />
-              <span className="text-xs text-gray-500 font-mono w-16">{speed}ms</span>
+              <label className="text-sm font-semibold text-[#a09880]">Speed</label>
+              <input type="range" min={10} max={500} step={10} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} className="w-28 accent-yellow-500" dir="rtl" />
+              <span className="text-xs text-[#a09880] font-mono w-16">{speed}ms</span>
             </div>
           </div>
         </div>
@@ -188,36 +188,32 @@ export default function BFS() {
         {/* Live Status Box */}
         {currentFrame && (
           <div className={`rounded-2xl shadow-lg p-5 mb-6 border transition-all duration-300 ${
-            currentFrame.type === "path" ? "bg-emerald-50 border-emerald-300"
-              : currentFrame.type === "not_found" ? "bg-red-50 border-red-300"
-              : "bg-indigo-50 border-indigo-200"
+            currentFrame.type === "path" ? "bg-emerald-950/30 border-emerald-500/30 text-emerald-400"
+              : currentFrame.type === "not_found" ? "bg-rose-950/30 border-rose-500/30 text-rose-400"
+              : "bg-[#211c15] border-[#332b21] text-yellow-400"
           }`}>
-            <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">💬 Algorithm Status</h3>
-            <p className={`text-base font-medium leading-relaxed ${
-              currentFrame.type === "path" ? "text-emerald-700"
-                : currentFrame.type === "not_found" ? "text-red-700"
-                : "text-indigo-700"
-            }`}>
+            <h3 className="text-sm font-bold text-[#a09880] uppercase tracking-wider mb-2">💬 Algorithm Status</h3>
+            <p className="text-base font-medium leading-relaxed">
               {currentFrame.description}
             </p>
           </div>
         )}
 
         {/* Legend */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6 border border-white/40">
+        <div className="bg-[#1a1611]/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6 border border-[#332b21]">
           <div className="flex flex-wrap gap-6 justify-center">
-            <div className="flex items-center gap-2"><div className="w-6 h-6 bg-green-500 rounded-md shadow-md ring-2 ring-green-400"></div><span className="text-sm font-medium text-gray-600">Start Node</span></div>
-            <div className="flex items-center gap-2"><div className="w-6 h-6 bg-red-500 rounded-md shadow-md ring-2 ring-red-400"></div><span className="text-sm font-medium text-gray-600">End Node</span></div>
-            <div className="flex items-center gap-2"><div className="w-6 h-6 bg-slate-700 rounded-sm"></div><span className="text-sm font-medium text-gray-600">Wall Node (Click/Drag)</span></div>
-            <div className="flex items-center gap-2"><div className="w-6 h-6 bg-blue-300 rounded-md"></div><span className="text-sm font-medium text-gray-600">Visited Node</span></div>
-            <div className="flex items-center gap-2"><div className="w-6 h-6 bg-yellow-400 rounded-md shadow-md ring-1 ring-yellow-500"></div><span className="text-sm font-medium text-gray-600">Shortest Path</span></div>
+            <div className="flex items-center gap-2"><div className="w-6 h-6 bg-emerald-500 rounded-md shadow-md ring-2 ring-emerald-400"></div><span className="text-sm font-medium text-[#a09880]">Start Node</span></div>
+            <div className="flex items-center gap-2"><div className="w-6 h-6 bg-rose-500 rounded-md shadow-md ring-2 ring-rose-400"></div><span className="text-sm font-medium text-[#a09880]">End Node</span></div>
+            <div className="flex items-center gap-2"><div className="w-6 h-6 bg-[#524433] rounded-sm"></div><span className="text-sm font-medium text-[#a09880]">Wall Node (Click/Drag)</span></div>
+            <div className="flex items-center gap-2"><div className="w-6 h-6 bg-yellow-500/40 rounded-md"></div><span className="text-sm font-medium text-[#a09880]">Visited Node</span></div>
+            <div className="flex items-center gap-2"><div className="w-6 h-6 bg-[#FFD700] rounded-md shadow-md ring-1 ring-yellow-300"></div><span className="text-sm font-medium text-[#a09880]">Shortest Path</span></div>
           </div>
         </div>
 
         {/* Grid Visualization */}
         <div className="flex justify-center mb-10 overflow-x-auto">
           <div 
-            className="grid gap-[1px] bg-slate-300 border-4 border-slate-300 shadow-xl rounded-lg select-none"
+            className="grid gap-[1px] bg-[#332b21] border-4 border-[#332b21] shadow-xl rounded-lg select-none"
             style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))` }}
           >
             {grid.map((row, rowIndex) => (

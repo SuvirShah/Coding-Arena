@@ -13,7 +13,7 @@
 .section-title {
   font-size: 0.875rem;
   text-transform: uppercase;
-  color: var(--color-muted, #9ca3af);
+  color: var(--color-muted, #a09880);
   letter-spacing: 0.05em;
   margin-bottom: 0.5rem;
   font-weight: 600;
@@ -43,5 +43,5 @@
 
 .nav-link.active {
   background-color: var(--color-primary);
-  color: #fff;
+  color: #000;
 }
