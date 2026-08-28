@@ -82,6 +82,7 @@ function UpdateProblem() {
     handleSubmit,
     setValue,
     reset,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(problemSchema),
@@ -187,10 +188,17 @@ function UpdateProblem() {
     }
 
     try {
-      console.log("Updating problem:", selectedProblemId, data);
+      const payload = {
+        ...data,
+        tags: Array.isArray(data.tags) ? data.tags : [data.tags],
+        startCode: data.startCode || [],
+        referenceSolution: data.referenceSolution || [],
+      };
+
+      console.log("Updating problem:", selectedProblemId, payload);
       const res = await axiosClient.put(
         `/problem/update/${selectedProblemId}`,
-        data
+        payload
       );
       console.log("Update response:", res.data);
       alert("Problem updated successfully");
@@ -303,10 +311,21 @@ function UpdateProblem() {
                   </label>
                   <select
                     className="select select-bordered w-full"
-                    onChange={(e) => setValue("tags", [e.target.value])}
-                    value={(Array.isArray && undefined) || undefined}
+                    onChange={(e) =>
+                      setValue("tags", [e.target.value], { shouldValidate: true })
+                    }
+                    value={watch("tags")?.[0] || "array"}
                   >
+                    <option value="array">Array</option>
+                    <option value="linkedlist">Linked List</option>
+                    <option value="dp">Dynamic Programming</option>
+                    <option value="graph">Graph</option>
                   </select>
+                  {errors.tags && (
+                    <span className="text-error text-sm mt-1">
+                      {errors.tags.message}
+                    </span>
+                  )}
                 </div>
               </div>
 
