@@ -1,8 +1,8 @@
 const path = require("path");
 require("dotenv").config({
   path: path.resolve(__dirname, "../.env"),
-  quiet: true
 });
+// require("dotenv").config();
 const express = require("express");
 const main=require("./config/db")
 const app = express();
