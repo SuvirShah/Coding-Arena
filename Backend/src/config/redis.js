@@ -10,7 +10,7 @@ const { createClient } = require("redis");
 // });
 const redisClient = createClient({
     username: 'default',
-    password: 'process.env.REDIS_PASS',
+    password:process.env.REDIS_PASS,
     socket: {
         host: 'leafy-charming-suit-66606.db.redis.io',
         port: 10519
