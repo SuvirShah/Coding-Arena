@@ -8,9 +8,6 @@ const { createClient } = require("redis");
 //         port: 18479
 //     }
 // });
-
-import { createClient } from 'redis';
-
 const redisClient = createClient({
     username: 'default',
     password: 'process.env.REDIS_PASS',
