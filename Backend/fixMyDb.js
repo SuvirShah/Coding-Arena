@@ -21,7 +21,7 @@ async function cleanDB() {
                 startCode: [
                     { language: "c++", boilerplate: "#include <iostream>\nusing namespace std;\n\nint main() {\n    // Write your code here\n    return 0;\n}" },
                     { language: "java", boilerplate: "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        // Write your code here\n    }\n}" },
-                    { language: "javascript", boilerplate: "function solve() {\n    // Write your code here\n}\n\nsolve();" }
+                    { language: "javascript", boilerplate: "const fs = require('fs');\n\nfunction solve() {\n    const input = fs.readFileSync(0, 'utf-8').trim();\n    // Write your code here\n}\n\nsolve();" }
                 ],
                 referenceSolution: [
                     { language: "c++", completeCode: "// solution" },

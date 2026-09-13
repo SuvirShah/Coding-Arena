@@ -1,20 +1,23 @@
 const { createClient } = require("redis");
 
+// const redisClient = createClient({
+//     username: 'default',
+//     password: process.env.REDIS_PASS,
+//     socket: {
+//         host: 'refreshing-tree-range-14648.db.redis.io',
+//         port: 18479
+//     }
+// });
+
+import { createClient } from 'redis';
+
 const redisClient = createClient({
     username: 'default',
-    password: process.env.REDIS_PASS,
+    password: 'process.env.REDIS_PASS',
     socket: {
-        host: 'refreshing-tree-range-14648.db.redis.io',
-        port: 18479
+        host: 'leafy-charming-suit-66606.db.redis.io',
+        port: 10519
     }
 });
-
-// client.on('error', err => console.log('Redis Client Error', err));
-
-// await client.connect();
-
-// await client.set('foo', 'bar');
-// const result = await client.get('foo');
-// console.log(result)
 
 module.exports = redisClient;

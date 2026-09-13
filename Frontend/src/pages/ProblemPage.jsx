@@ -7,6 +7,31 @@ import SubmissionHistory from "../components/SubmissionHistory";
 import ChatAi from "../components/ChatAi";
 import Editorial from "../components/Editorial";
 
+const DEFAULT_BOILERPLATES = {
+  javascript: `const fs = require('fs');
+
+function solve() {
+    const input = fs.readFileSync(0, 'utf-8').trim();
+    // Write your code here
+}
+
+solve();`,
+  "c++": `#include <iostream>
+using namespace std;
+
+int main() {
+    // Write your code here
+    return 0;
+}`,
+  java: `import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // Write your code here
+    }
+}`
+};
+
 const ProblemPage = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
   const [code, setCode] = useState("");
@@ -25,12 +50,31 @@ const ProblemPage = () => {
 
   const loading = isRunning || isSubmitting;
 
+  const getBoilerplate = (lang) => {
+    const langKey = lang?.toLowerCase();
+    if (!problem) return DEFAULT_BOILERPLATES[langKey] || "";
+    
+    const matchedCode = problem?.startCode?.find((sc) => {
+      const scLang = sc.language?.toLowerCase();
+      return (
+        scLang === langKey ||
+        (langKey === "javascript" && (scLang === "js" || scLang === "node")) ||
+        (langKey === "c++" && scLang === "cpp")
+      );
+    });
+
+    const boilerplate = matchedCode?.boilerplate;
+    // If the database boilerplate is missing, empty, or the basic stub without input reading
+    if (boilerplate && boilerplate.trim() && boilerplate.trim() !== "function solve() {\n    // Write your code here\n}\n\nsolve();") {
+      return boilerplate;
+    }
+
+    return DEFAULT_BOILERPLATES[langKey] || boilerplate || "";
+  };
+
   useEffect(() => {
     if (problem) {
-      const matchedCode = problem?.startCode?.find(
-        (sc) => sc.language === selectedLanguage
-      );
-      setCode(matchedCode?.boilerplate || "");
+      setCode(getBoilerplate(selectedLanguage));
     }
   }, [selectedLanguage, problem]);
 
@@ -401,8 +445,7 @@ const ProblemPage = () => {
                 className="btn btn-sm btn-ghost text-[#a09a8e] hover:text-[#ffd700] hover:bg-[#26221d] rounded-lg px-2.5 transition-all duration-200"
                 title="Reset to default code"
                 onClick={() => {
-                  const matchedCode = problem?.startCode?.find(sc => sc.language === selectedLanguage);
-                  setCode(matchedCode?.boilerplate || "");
+                  setCode(getBoilerplate(selectedLanguage));
                 }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mr-1">
