@@ -150,14 +150,11 @@ const getProblemById = async(req, res) => {
 }
 const getAllProblem=async(req,res)=>{
     try{
-        const getProblems=await Problem.find({}).select('_id title description difficulty');
-        if(getProblems.length==0){
-            return res.status(404).send("No Such Problem Exsists");
-        }
+        const getProblems=await Problem.find({}).select('_id title description difficulty tags');
         res.status(200).json(getProblems);
     }
     catch(err){
-        res.status(404).send("Error:"+err);
+        res.status(500).json({error:"Failed to fetch problems"});
     }
 }
 const solvedAllProblembyUser=async(req,res)=>{
