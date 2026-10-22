@@ -14,8 +14,14 @@ const validate=(data)=>{
 
     if(!validator.isEmail(data.emailId))
         throw new Error("Invalid Email");
-    if(!validator.isStrongPassword(data.password))
-        throw new Error("Weak Password");
+    if(!validator.isStrongPassword(data.password,{
+        minLength:8,
+        minLowercase:1,
+        minUppercase:0,
+        minNumbers:1,
+        minSymbols:0
+    }))
+        throw new Error("Password must be at least 8 characters with at least one number");
     
 
 }

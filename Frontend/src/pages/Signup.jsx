@@ -9,7 +9,10 @@ import { useEffect, useState } from "react";
 const signupSchema = z.object({
   firstName: z.string().min(3, "Name should contain at least three letters"),
   emailId: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters")
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/\d/, "Password must contain at least one number")
 });
 
 function Signup() {

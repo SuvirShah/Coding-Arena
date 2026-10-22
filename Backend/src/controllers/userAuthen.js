@@ -15,12 +15,16 @@ const register=async (req,res)=>{
         validate(req.body);
         const {firstName,emailId,password}=req.body;
     
-        req.body.password=await bcrypt.hash(password,10);
-        req.body.role='user';
+        const hashedPassword=await bcrypt.hash(password,10);
 
-        const user=await User.create(req.body);
+        const user=await User.create({
+            firstName:firstName.trim(),
+            emailId:emailId,
+            password:hashedPassword,
+            role:'user'
+        });
 
-        const token=jwt.sign({_id:user._id,emailId:emailId,role:'user'},process.env.JWT_KEY,{expiresIn:60*60});
+        const token=jwt.sign({_id:user._id,emailId:user.emailId,role:user.role},process.env.JWT_KEY,{expiresIn:60*60});
 
         res.cookie('token',token,{
             httpOnly: true,
@@ -31,7 +35,8 @@ const register=async (req,res)=>{
         const reply={
             firstName:user.firstName,
             emailId:user.emailId,
-            _id:user._id
+            _id:user._id,
+            role:user.role
         }
         res.status(201).json({
             user:reply,
@@ -42,6 +47,12 @@ const register=async (req,res)=>{
 
 
     catch (err) {
+        // Handle duplicate email (MongoDB E11000 unique constraint violation)
+        if(err.code===11000){
+            return res.status(400).json({
+                message:"An account with this email already exists"
+            });
+        }
         res.status(400).json({
         message: err.message || "Registration failed"
     });
@@ -59,8 +70,9 @@ const login=async(req,res)=>{
         if(!password)
             throw new Error("Invalid Credentials");
 
-
-        const user=await User.findOne({emailId});
+        // Normalize email to match what Mongoose stores (schema has lowercase:true)
+        const normalizedEmail=emailId.trim().toLowerCase();
+        const user=await User.findOne({emailId:normalizedEmail});
 
         if (!user) {
             console.log(`[LOGIN] No user found with email: ${emailId}`);
@@ -113,18 +125,26 @@ const logout=async(req,res)=>{
     try{
         const {token}=req.cookies;
 
-        const payload=jwt.decode(token);
+        if(token){
+            const payload=jwt.decode(token);
+            if(payload && payload.exp){
+                await redisClient.set(`token:${token}`,"Blocked");
+                await redisClient.expireAt(`token:${token}`,payload.exp);
+            }
+        }
 
-        await redisClient.set(`token:${token}`,"Blocked");
-        await redisClient.expireAt(`token:${token}`,payload.exp);
-
-
-        res.cookie("token",null,{expires:new Date(Date.now())});
-        res.send("Logged Out Sucessfully");
+        // Must include sameSite + secure to clear cross-origin cookies
+        res.cookie("token","",{
+            httpOnly:true,
+            sameSite:"none",
+            secure:true,
+            expires:new Date(0)
+        });
+        res.status(200).json({message:"Logged Out Successfully"});
 
     }
     catch(err){
-        res.status(503).send("Error:"+err); 
+        res.status(503).json({message:"Logout failed: "+err.message}); 
     }
 }
 
