@@ -52,6 +52,8 @@ const login=async(req,res)=>{
 
     try{
         const {emailId,password}=req.body;
+        console.log(`[LOGIN] Attempt for email: ${emailId}`);
+
         if(!emailId)
             throw new Error("Invalid Credentials");
         if(!password)
@@ -61,13 +63,17 @@ const login=async(req,res)=>{
         const user=await User.findOne({emailId});
 
         if (!user) {
+            console.log(`[LOGIN] No user found with email: ${emailId}`);
             throw new Error("Invalid Credentials");
         }
 
+        console.log(`[LOGIN] User found: ${user._id}, comparing password...`);
         const match=await bcrypt.compare(password,user.password);
 
-        if(!match)
+        if(!match){
+            console.log(`[LOGIN] Password mismatch for user: ${user._id}`);
             throw new Error("Invalid Credentials");
+        }
 
         const token=jwt.sign({_id:user._id,emailId:emailId,role:user.role},process.env.JWT_KEY,{expiresIn:60*60});
 
@@ -85,6 +91,7 @@ const login=async(req,res)=>{
             role:user.role
         }
 
+        console.log(`[LOGIN] Success for user: ${user._id}, token set`);
         res.status(200).json({
             user:reply,
             message:"Logged In Sucessfully"
@@ -95,7 +102,8 @@ const login=async(req,res)=>{
     }
 
     catch(err){
-        res.status(401).send("Error:"+err);
+        console.log(`[LOGIN] Failed: ${err.message}`);
+        res.status(401).json({ message: err.message || "Login failed" });
     }
 }
 

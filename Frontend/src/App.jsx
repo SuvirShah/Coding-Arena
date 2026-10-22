@@ -20,8 +20,7 @@ function App(){
   const dispatch=useDispatch();
   const {isAuthenticated,user,loading}=useSelector((state)=>state.auth);
 
-  console.log(user?.role);
-  console.log(isAuthenticated);
+
   useEffect(()=>{
     dispatch(checkAuth());
   },[dispatch])
@@ -48,7 +47,7 @@ function App(){
       <Route path="/visualizer/*" element={<VisualizerApp />} />
     </Routes>
   )
-  console.log({isAuthenticated,loading});
+
 }
 
 export default App
