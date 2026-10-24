@@ -148,15 +148,39 @@ const getProblemById = async(req, res) => {
         res.status(500).send("Error: " + err);
     }
 }
-const getAllProblem=async(req,res)=>{
-    try{
-        const getProblems=await Problem.find({}).select('_id title description difficulty tags');
-        res.status(200).json(getProblems);
+const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const getAllProblem = async (req, res) => {
+    try {
+        const { difficulty, tag, search, page, limit } = req.query;
+
+        const filter = {};
+        if (["easy", "medium", "hard"].includes(difficulty)) filter.difficulty = difficulty;
+        if (typeof tag === "string" && tag) filter.tags = tag;
+        if (typeof search === "string" && search.trim()) {
+            filter.title = { $regex: escapeRegex(search.trim().slice(0, 50)), $options: "i" };
+        }
+
+        const query = Problem.find(filter).select("_id title description difficulty tags").sort({ _id: 1 });
+
+        if (page === undefined) {
+            return res.status(200).json(await query.lean());
+        }
+
+        const p = Math.max(parseInt(page, 10) || 1, 1);
+        const l = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 100);
+
+        const [problems, total] = await Promise.all([
+            query.skip((p - 1) * l).limit(l).lean(),
+            Problem.countDocuments(filter),
+        ]);
+
+        res.status(200).json({ problems, page: p, limit: l, total, totalPages: Math.ceil(total / l) });
+    } 
+    catch (err) {
+        res.status(500).send("Error: " + err.message);
     }
-    catch(err){
-        res.status(500).json({error:"Failed to fetch problems"});
-    }
-}
+};
 const solvedAllProblembyUser=async(req,res)=>{
     try{
         const userId=(req.result._id);

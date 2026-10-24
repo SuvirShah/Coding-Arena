@@ -1,0 +1,19 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "fixMyDb.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+  "start": "node index.js",
+  "dev": "nodemon index.js",
+  "test": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles"
+},
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "cross-env": "^10.1.0"
+  }
+}

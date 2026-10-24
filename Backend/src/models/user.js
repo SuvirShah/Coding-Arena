@@ -38,6 +38,12 @@ const userSchema=new Schema({
             ref:'problem'}],
        default: [],
     },
+    stats:{
+        solved:{type:Number,default:0},
+        easy:{type:Number,default:0},
+        medium:{type:Number,default:0},
+        hard:{type:Number,default:0},
+    },
     password:{
         type:String,
         required:true 

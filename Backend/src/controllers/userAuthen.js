@@ -173,12 +173,12 @@ const adminRegister=async(req,res)=>{
 const deleteProfile=async(req,res)=>{
     try{
         const id=req.result._id;
+        await Submission.deleteMany({userId:id});
         await User.findByIdAndDelete(id);
-        Submission.deleteMany({id});
         res.status(200).send("Deleted Sucessfully");
     }
     catch(err){
-        res.status(404).send("Server Error"+err);
+        res.status(500).send("Server Error: "+err.message);
     }
 };
 const checkUser=(req,res)=>{
@@ -194,74 +194,67 @@ const checkUser=(req,res)=>{
     })
 
 }
-const getProfile=async(req,res)=>{
-    try{
-        const userId=req.result._id;
+const getProfile = async (req, res) => {
+    try {
+        const userId = req.result._id;
+        const since = new Date();
+        since.setDate(since.getDate() - 365);
 
-        const user=await User.findById(userId).select('-password');
-        if(!user){
-            return res.status(404).json({message:"User not found"});
-        }
+        const [user, total, accepted, recent, activity] = await Promise.all([
+            User.findById(userId)
+                .select("-password")
+                .populate({ path: "problemSolved", select: "_id title difficulty tags" })
+                .lean(),
+            Submission.countDocuments({ userId }),
+            Submission.countDocuments({ userId, status: "accepted" }),
+            Submission.find({ userId })
+                .sort({ createdAt: -1 })
+                .limit(10)
+                .select("problemId language status runtime memory testCasesPassed totalTestCases createdAt")
+                .lean(),
+            Submission.aggregate([
+                { $match: { userId, createdAt: { $gte: since } } },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                        count: { $sum: 1 },
+                    },
+                },
+                { $sort: { _id: 1 } },
+            ]),
+        ]);
 
-        // Get solved problems with difficulty info
-        const solvedProblems=await Problem.find({
-            _id:{$in:user.problemSolved}
-        }).select('_id title difficulty tags');
+        if (!user) return res.status(404).json({ message: "User not found" });
 
-        // Difficulty breakdown
-        const difficultyCount={easy:0,medium:0,hard:0};
-        for(const problem of solvedProblems){
-            if(difficultyCount.hasOwnProperty(problem.difficulty)){
-                difficultyCount[problem.difficulty]++;
-            }
-        }
-
-        // Submission stats
-        const submissions=await Submission.find({userId:userId}).sort({createdAt:-1});
-        const totalSubmissions=submissions.length;
-        const acceptedSubmissions=submissions.filter(s=>s.status==='accepted').length;
-        const acceptanceRate=totalSubmissions>0
-            ?Math.round((acceptedSubmissions/totalSubmissions)*100)
-            :0;
-
-        const recentSubmissions=submissions.slice(0,10).map(sub=>({
-            _id:sub._id,
-            problemId:sub.problemId,
-            language:sub.language,
-            status:sub.status,
-            runtime:sub.runtime,
-            memory:sub.memory,
-            testCasesPassed:sub.testCasesPassed,
-            totalTestCases:sub.totalTestCases,
-            createdAt:sub.createdAt
-        }));
+        const stats = user.stats || { solved: 0, easy: 0, medium: 0, hard: 0 };
 
         res.status(200).json({
-            user:{
-                _id:user._id,
-                firstName:user.firstName,
-                lastName:user.lastName,
-                emailId:user.emailId,
-                role:user.role,
-                createdAt:user.createdAt
+            user: {
+                _id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                emailId: user.emailId,
+                role: user.role,
+                createdAt: user.createdAt,
             },
-            problemsSolved:{
-                total:solvedProblems.length,
-                easy:difficultyCount.easy,
-                medium:difficultyCount.medium,
-                hard:difficultyCount.hard,
-                problems:solvedProblems
+            problemsSolved: {
+                total: stats.solved,
+                easy: stats.easy,
+                medium: stats.medium,
+                hard: stats.hard,
+                problems: user.problemSolved,
             },
-            submissions:{
-                total:totalSubmissions,
-                accepted:acceptedSubmissions,
-                acceptanceRate:acceptanceRate,
-                recent:recentSubmissions
-            }
+            submissions: {
+                total,
+                accepted,
+                acceptanceRate: total > 0 ? Math.round((accepted / total) * 100) : 0,
+                recent,
+            },
+            // new: [{ _id: "2026-10-24", count: 3 }, ...] for a heatmap later
+            activity: activity.map((a) => ({ date: a._id, count: a.count })),
         });
-    }
-    catch(err){
-        res.status(500).json({message:"Server Error:"+err.message});
+    } catch (err) {
+        res.status(500).json({ message: "Server Error: " + err.message });
     }
 };
 module.exports={register , login, logout, adminRegister,deleteProfile,checkUser,getProfile };

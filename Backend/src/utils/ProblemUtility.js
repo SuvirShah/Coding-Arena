@@ -1,90 +1,67 @@
-const axios=require("axios");
+const axios = require("axios");
 
-const getLanguageById=(lang)=>{
-    const language={
-        "c++":54,
-        "cpp":54,
-        "java":62,
-        "javascript":63,
-        "js":63,
-        "python":71,
-        "py":71
+const JUDGE0_BASE_URL = process.env.JUDGE0_URL || "https://judge0-ce.p.rapidapi.com";
+
+const judge0Headers = () => ({
+  "x-rapidapi-key": process.env.JUDGE0_RAPID_API_KEY,
+  "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
+  "Content-Type": "application/json",
+});
+
+const LANGUAGE_IDS = {
+  "c++": 54,
+  cpp: 54,
+  java: 62,
+  javascript: 63,
+  js: 63,
+  python: 71,
+  py: 71,
+};
+
+const getLanguageById = (lang) => {
+  const id = LANGUAGE_IDS[lang?.toLowerCase()];
+  if (!id) throw new Error(`Unsupported language: ${lang}`);
+  return id;
+};
+
+const mapJudgeStatus = (statusId) => {
+  if (statusId === 3) return "accepted";
+  if (statusId === 4) return "wrong result";
+  if (statusId === 5) return "tle";
+  if (statusId === 6) return "compilation error";
+  if (statusId >= 7 && statusId <= 12) return "runtime error";
+  return "internal error";
+};
+
+const submitBatch = async (submissions) => {
+  const response = await axios.post(
+    `${JUDGE0_BASE_URL}/submissions/batch`,
+    { submissions },
+    {
+      params: { base64_encoded: "false" },
+      headers: judge0Headers(),
+      timeout: 10000,
     }
+  );
+  return response.data;
+};
 
-    return language[lang?.toLowerCase()] || 54;
-}
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const submitBatch= async (submissions)=>{
-    const options = {
-    method: 'POST',
-    url: 'https://judge0-ce.p.rapidapi.com/submissions/batch',
-    params: {
-        base64_encoded: 'false'
-    },
-    headers: {
-        'x-rapidapi-key': process.env.JUDGE0_RAPID_API_KEY,
-        'x-rapidapi-host': 'judge0-ce.p.rapidapi.com',
-        'Content-Type': 'application/json'
-    },
-    data: {
-        submissions
-    }
-    };
+const submitToken = async (tokens, { maxAttempts = 15, baseDelayMs = 700 } = {}) => {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const response = await axios.get(`${JUDGE0_BASE_URL}/submissions/batch`, {
+      params: { tokens: tokens.join(","), base64_encoded: "false", fields: "*" },
+      headers: judge0Headers(),
+      timeout: 10000,
+    });
 
-    async function fetchData() {
-        try {
-            const response = await axios.request(options);
-            return response.data;
-        } catch (error) {
-            console.error(error);
-        }
-    }
+    const { submissions } = response.data;
+    if (submissions.every((s) => s.status_id > 2)) return submissions;
 
-    return await fetchData();
+    await wait(Math.min(baseDelayMs * 1.5 ** attempt, 3000));
+  }
+  throw new Error("Judge0 timed out while waiting for results");
+};
 
-} 
-const waiting = (timer) => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, timer);
-  });
-};   
-const submitToken=async(resultToken)=>{
-    const options = {
-    method: 'GET',
-    url: 'https://judge0-ce.p.rapidapi.com/submissions/batch',
-    params: {
-        tokens: resultToken.join(','),
-        base64_encoded: 'false',
-        fields: '*'
-    },
-    headers: {
-        'x-rapidapi-key': process.env.JUDGE0_RAPID_API_KEY,
-        'x-rapidapi-host': 'judge0-ce.p.rapidapi.com',
-        'Content-Type': 'application/json'
-    }
-    };
-
-    async function fetchData() {
-        try {
-            const response = await axios.request(options);
-            return response.data;
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    while(true){
-        const result=await fetchData();
-        const isResultObtained=result.submissions.every((r)=>r.status_id>2);
-        if(isResultObtained)
-            return result.submissions;
-
-        await waiting(1000);
-    }
-
-}
-
-module.exports={getLanguageById,submitBatch,submitToken};
-
-
-
+module.exports = { getLanguageById, mapJudgeStatus, submitBatch, submitToken };

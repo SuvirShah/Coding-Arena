@@ -9,7 +9,7 @@ export const apiSlice=createApi({
     tagTypes:['AllProblems','Profile','Submission'],
     endpoints:(builder)=>({
         getProblems:builder.query({
-            query:()=>'/problem/getAllProblem',
+            query:(params={})=>({ url:'/problem/getAllProblem', params }),
             providesTags:['AllProblems']
         }),
         getSolvedProblems:builder.query({

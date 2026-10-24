@@ -25,7 +25,7 @@ const submissionSchema=new Schema({
     },
     status:{
         type:String,
-        enum:['pending','accepted','runtime error','tle','mle','wrong result'],
+        enum:['pending','accepted','wrong result','tle','mle','runtime error','compilation error','internal error'],
         default:'pending'
     },
     runtime:{
@@ -52,7 +52,7 @@ const submissionSchema=new Schema({
     timestamps:true
 });
 
-submissionSchema.index({userId:1,problemId:1});
+submissionSchema.index({userId:1,problemId:1,createdAt: -1});
 
 const Submission=mongoose.model('submission',submissionSchema);
 

@@ -64,6 +64,7 @@ const IntializeConnection=async()=>{
 }
 
 
-
-
-IntializeConnection();
+if (process.env.NODE_ENV !== 'test') {
+    IntializeConnection();
+}
+module.exports = app;

@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "./authSlice";
 import { useGetProblemsQuery, useGetSolvedProblemsQuery } from "./apiSlice";
+
+const PAGE_SIZE = 20;
 
 function HomePage() {
   const dispatch = useDispatch();
@@ -11,37 +13,63 @@ function HomePage() {
   const isHomePage = location.pathname === "/";
   const { user } = useSelector((state) => state.auth);
 
-  const { data: problems = [] } = useGetProblemsQuery();
-  const { data: solvedProblems = [] } = useGetSolvedProblemsQuery(undefined, { skip: !user });
-
   const [filters, setFilters] = useState({
     difficulty: "all",
     tag: "all",
     status: "all",
   });
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [page, setPage] = useState(1);
+
+  // wait 400ms after typing stops before hitting the API
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  const queryParams = { page, limit: PAGE_SIZE };
+  if (filters.difficulty !== "all") queryParams.difficulty = filters.difficulty;
+  if (filters.tag !== "all") queryParams.tag = filters.tag;
+  if (filters.status !== "all") queryParams.status = filters.status;
+  if (debouncedSearch) queryParams.search = debouncedSearch;
+
+  // `data` keeps the previous page while the next one loads, so the table doesn't flash empty
+  const { data, isFetching } = useGetProblemsQuery(queryParams);
+  const problems = data?.problems ?? [];
+  const total = data?.total ?? 0;
+  const totalPages = data?.totalPages ?? 1;
+
+  const { data: solvedProblems = [] } = useGetSolvedProblemsQuery(undefined, { skip: !user });
+  const solvedIds = useMemo(
+    () => new Set(solvedProblems.map((sp) => sp._id)),
+    [solvedProblems]
+  );
+
+  const updateFilter = (key, value) => {
+    setFilters((f) => ({ ...f, [key]: value }));
+    setPage(1);
+  };
+
+  const clearFilters = () => {
+    setFilters({ difficulty: "all", tag: "all", status: "all" });
+    setSearch("");
+    setDebouncedSearch("");
+    setPage(1);
+  };
+
+  const goToPage = (p) => {
+    setPage(p);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const handleLogout = () => {
     dispatch(logoutUser());
     navigate("/login");
   };
-
-  const filteredProblems = problems.filter((problem) => {
-    const isSolved = solvedProblems.some((sp) => sp._id === problem._id);
-
-    const difficultyMatch =
-      filters.difficulty === "all" ||
-      problem.difficulty === filters.difficulty;
-
-    const tagMatch =
-      filters.tag === "all" || problem.tags?.includes(filters.tag);
-
-    const statusMatch =
-      filters.status === "all" ||
-      (filters.status === "solved" && isSolved) ||
-      (filters.status === "unsolved" && !isSolved);
-
-    return difficultyMatch && tagMatch && statusMatch;
-  });
 
   const DIFFICULTY_BADGE = {
     easy: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
@@ -156,12 +184,18 @@ function HomePage() {
           {/* Filters Bar */}
           <div className="bg-[#181614] rounded-xl border border-[#382e1e] p-5 mb-8 shadow-md flex flex-col md:flex-row gap-4 items-center justify-between transition-all duration-200">
             <div className="flex flex-wrap gap-3 w-full md:w-auto">
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search problems..."
+                className="input input-sm rounded-lg bg-[#0c0b0a] text-[#f0f0f0] border border-[#382e1e] hover:border-[#ffd700]/50 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-[#ffd700] w-full sm:w-56"
+              />
+
               <select
                 className="select select-sm rounded-lg bg-[#0c0b0a] text-[#f0f0f0] border border-[#382e1e] hover:border-[#ffd700]/50 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-[#ffd700]"
                 value={filters.difficulty}
-                onChange={(e) =>
-                  setFilters({ ...filters, difficulty: e.target.value })
-                }
+                onChange={(e) => updateFilter("difficulty", e.target.value)}
               >
                 <option value="all">All Difficulty</option>
                 <option value="easy">Easy</option>
@@ -172,38 +206,48 @@ function HomePage() {
               <select
                 className="select select-sm rounded-lg bg-[#0c0b0a] text-[#f0f0f0] border border-[#382e1e] hover:border-[#ffd700]/50 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-[#ffd700]"
                 value={filters.tag}
-                onChange={(e) =>
-                  setFilters({ ...filters, tag: e.target.value })
-                }
+                onChange={(e) => updateFilter("tag", e.target.value)}
               >
                 <option value="all">All Tags</option>
                 <option value="array">Array</option>
+                <option value="string">String</option>
                 <option value="linkedlist">Linked List</option>
                 <option value="dp">Dynamic Programming</option>
                 <option value="graph">Graph</option>
+                <option value="tree">Tree</option>
+                <option value="stack">Stack</option>
+                <option value="queue">Queue</option>
+                <option value="hashmap">Hash Map</option>
+                <option value="binarysearch">Binary Search</option>
+                <option value="twopointers">Two Pointers</option>
+                <option value="slidingwindow">Sliding Window</option>
+                <option value="sorting">Sorting</option>
+                <option value="math">Math</option>
+                <option value="greedy">Greedy</option>
+                <option value="backtracking">Backtracking</option>
+                <option value="heap">Heap</option>
               </select>
 
               <select
                 className="select select-sm rounded-lg bg-[#0c0b0a] text-[#f0f0f0] border border-[#382e1e] hover:border-[#ffd700]/50 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-[#ffd700]"
                 value={filters.status}
-                onChange={(e) =>
-                  setFilters({ ...filters, status: e.target.value })
-                }
+                onChange={(e) => updateFilter("status", e.target.value)}
               >
                 <option value="all">All Status</option>
                 <option value="solved">Solved</option>
                 <option value="unsolved">Unsolved</option>
               </select>
             </div>
-            
+
             <div className="w-full md:w-auto text-sm text-[#a09a8e] font-medium">
-              Showing <span className="text-[#ffd700] font-semibold">{filteredProblems.length}</span> problem{filteredProblems.length !== 1 && 's'}
+              Showing <span className="text-[#ffd700] font-semibold">{problems.length}</span> of{" "}
+              <span className="text-[#ffd700] font-semibold">{total}</span> problem{total !== 1 && "s"}
             </div>
           </div>
 
           {/* Table Container */}
           <div className="bg-[#181614] rounded-xl border border-[#382e1e] overflow-hidden shadow-lg transition-all duration-200">
-            <div className="overflow-x-auto">
+            <div className={`overflow-x-auto transition-opacity ${isFetching ? "opacity-60" : ""}`}>
               <table className="table w-full">
                 {/* Table Head */}
                 <thead className="bg-[#110f0d] border-b border-[#382e1e] text-[#a09a8e]">
@@ -218,10 +262,8 @@ function HomePage() {
 
                 {/* Table Body */}
                 <tbody className="text-base divide-y divide-[#382e1e]/60">
-                  {filteredProblems.map((problem, idx) => {
-                    const isSolved = solvedProblems.some(
-                      (sp) => sp._id === problem._id
-                    );
+                  {problems.map((problem, idx) => {
+                    const isSolved = solvedIds.has(problem._id);
 
                     return (
                       <tr
@@ -230,9 +272,9 @@ function HomePage() {
                         onClick={() => navigate(`/problem/${problem._id}`)}
                       >
                         <td className="px-6 py-5 text-center text-[#a09a8e]/60 group-hover:text-[#a09a8e] transition-colors font-medium">
-                          {idx + 1}
+                          {(page - 1) * PAGE_SIZE + idx + 1}
                         </td>
-                        
+
                         <td className="px-6 py-5 font-semibold text-[#f0f0f0] group-hover:text-[#ffd700] transition-colors">
                           {problem.title}
                         </td>
@@ -284,7 +326,7 @@ function HomePage() {
             </div>
 
             {/* Empty State */}
-            {filteredProblems.length === 0 && (
+            {!isFetching && problems.length === 0 && (
               <div className="py-20 flex flex-col items-center justify-center text-center px-4">
                 <div className="bg-[#110f0d] border border-[#382e1e] w-16 h-16 rounded-full flex items-center justify-center mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-[#a09a8e]">
@@ -295,12 +337,37 @@ function HomePage() {
                 <p className="text-[#a09a8e] mt-1 max-w-sm">
                   We couldn't find any problems matching your current filters. Try adjusting your search criteria.
                 </p>
-                <button 
-                  onClick={() => setFilters({ difficulty: "all", tag: "all", status: "all" })}
+                <button
+                  onClick={clearFilters}
                   className="btn btn-outline btn-sm mt-4 rounded-lg border-[#382e1e] text-[#f0f0f0] hover:bg-[#ffd700] hover:text-black hover:border-[#ffd700] transition-all duration-200"
                 >
                   Clear Filters
                 </button>
+              </div>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-6 py-4 border-t border-[#382e1e] bg-[#110f0d]">
+                <span className="text-sm text-[#a09a8e]">
+                  Page <span className="text-[#ffd700] font-semibold">{page}</span> of {totalPages}
+                </span>
+                <div className="join">
+                  <button
+                    className="join-item btn btn-sm bg-[#181614] border-[#382e1e] text-[#f0f0f0] hover:bg-[#26221d] disabled:opacity-40"
+                    disabled={page <= 1 || isFetching}
+                    onClick={() => goToPage(page - 1)}
+                  >
+                    « Prev
+                  </button>
+                  <button
+                    className="join-item btn btn-sm bg-[#181614] border-[#382e1e] text-[#f0f0f0] hover:bg-[#26221d] disabled:opacity-40"
+                    disabled={page >= totalPages || isFetching}
+                    onClick={() => goToPage(page + 1)}
+                  >
+                    Next »
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -310,4 +377,4 @@ function HomePage() {
   );
 }
 
-export default HomePage;
+export default HomePage;
