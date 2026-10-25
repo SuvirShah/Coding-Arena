@@ -3,6 +3,7 @@ const Problem=require("../models/problems");
 const User=require("../models/user");
 const Submission = require("../models/submission");
 const SolutionVideo = require("../models/solutionVideo");
+const mongoose=require('mongoose');
 
 const createProblem=async(req,res)=>{
     const {title,description,difficulty,tags,visibleTestCases,
@@ -152,13 +153,19 @@ const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const getAllProblem = async (req, res) => {
     try {
-        const { difficulty, tag, search, page, limit } = req.query;
+        const { difficulty, tag, search, status, page, limit } = req.query;
 
         const filter = {};
         if (["easy", "medium", "hard"].includes(difficulty)) filter.difficulty = difficulty;
         if (typeof tag === "string" && tag) filter.tags = tag;
         if (typeof search === "string" && search.trim()) {
             filter.title = { $regex: escapeRegex(search.trim().slice(0, 50)), $options: "i" };
+        }
+
+        if (status === "solved") {
+            filter._id = { $in: req.result.problemSolved };
+        } else if (status === "unsolved") {
+            filter._id = { $nin: req.result.problemSolved };
         }
 
         const query = Problem.find(filter).select("_id title description difficulty tags").sort({ _id: 1 });
@@ -199,16 +206,21 @@ const submittedProblem=async(req,res)=>{
     try{
         const userId=req.result._id;
         const problemId=req.params.pid;
-        const ans=await Submission.find({userId,problemId});
 
-        if(ans.length==0){
-            return res.status(200).send("No Submission made");
+        if(!mongoose.isValidObjectId(problemId)){
+            return res.status(400).send("Invalid problem id");
         }
-        res.status(200).send(ans);
 
+        // Always an array (empty if none), newest first.
+        // Uses the {userId, problemId, createdAt} index.
+        const submissions=await Submission.find({userId,problemId})
+            .sort({createdAt:-1})
+            .lean();
+
+        res.status(200).send(submissions);
     }
     catch(err){
-        res.status(400).send("Error:"+err);
+        res.status(500).send("Error:"+err.message);
     }
 }
 module.exports={createProblem,updateProblem,deleteProblem,getProblemById,getAllProblem,solvedAllProblembyUser,submittedProblem};

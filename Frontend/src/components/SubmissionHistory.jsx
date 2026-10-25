@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useSubmissionForProblemByUserQuery } from '../pages/apiSlice';
 
 const SubmissionHistory = ({ problemId }) => {
-  const { data: submissions = [], isLoading: loading, isError, error: queryError } = useSubmissionForProblemByUserQuery(problemId);
+  const { data, isLoading: loading, isError, error: queryError } = useSubmissionForProblemByUserQuery(problemId);
+  const submissions = Array.isArray(data) ? data : [];
   const [selectedSubmission, setSelectedSubmission] = useState(null);
 
   const getStatusBadge = (status) => {
@@ -153,4 +154,4 @@ const SubmissionHistory = ({ problemId }) => {
   );
 };
 
-export default SubmissionHistory;
+export default SubmissionHistory;

@@ -38,15 +38,20 @@ EXAMPLES: ${JSON.stringify(testCases || []).slice(0, 1500)}
 STARTER CODE: ${JSON.stringify(startCode || []).slice(0, 1500)}`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.4-flash",
+      model: "gemini-2.5-flash",
       contents,
       config: { systemInstruction },
     });
 
     return res.status(200).json({ message: response.text });
   } catch (err) {
-    console.error("AI error:", err.message);
-    return res.status(503).json({ message: "AI is not available right now, try again shortly." });
+    console.error("AI error:", err?.status || "", err?.message);
+    const rateLimited = err?.status === 429;
+    return res.status(rateLimited ? 429 : 503).json({
+      message: rateLimited
+        ? "The AI is busy right now (quota reached). Try again in a minute."
+        : "AI is not available right now, try again shortly.",
+    });
   }
 };
 
