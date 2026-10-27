@@ -49,7 +49,7 @@ const Editorial = ({ secureUrl, thumbnailUrl, duration }) => {
       <video
         ref={videoRef}
         src={secureUrl}
-        poster={thumbnailUrl}
+        poster={thumbnailUrl?.startsWith("http") ? thumbnailUrl : undefined}
         onClick={togglePlayPause}
         className="w-full aspect-video bg-black cursor-pointer"
       />
@@ -101,4 +101,4 @@ const Editorial = ({ secureUrl, thumbnailUrl, duration }) => {
   );
 };
 
-export default Editorial;
+export default Editorial;

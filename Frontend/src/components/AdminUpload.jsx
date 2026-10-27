@@ -73,7 +73,11 @@ function AdminUpload(){
           console.error('Upload error:', err);
           setError('root', {
             type: 'manual',
-            message: err.response?.data?.message || 'Upload failed. Please try again.'
+            message:    (typeof err.response?.data?.error === 'string'
+                ? err.response.data.error
+                : err.response?.data?.error?.message) ||
+              err.response?.data?.message ||
+              'Upload failed. Please try again.'
           });
         } finally {
           setUploading(false);

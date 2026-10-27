@@ -1,10 +1,7 @@
 const cloudinary = require('cloudinary').v2;
+const mongoose = require('mongoose');
 const Problem = require("../models/problems");
-const User = require("../models/user");
 const SolutionVideo = require("../models/solutionVideo");
-const { sanitizeFilter } = require('mongoose');
-
-
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -12,18 +9,31 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_SECRET_API_KEY
 });
 
+const folderFor = (problemId) => `leetcode-solutions/${problemId}/`;
 
-const generateUploadSignature=async(req,res)=>{
-    try{
-        const {problemId}=req.params;
-        const {userId}=req.result._id;
-        const problem=await Problem.findById(problemId);
-        if(!problem){
-            return res.status(400).json({error:"Problem doesn't exsit"})
+const buildThumbnailUrl = (publicId) =>
+  cloudinary.url(publicId, {
+    resource_type: 'video',
+    secure: true,
+    format: 'jpg',
+    transformation: [{ width: 640, crop: 'limit' }]
+  });
+
+const generateUploadSignature = async (req, res) => {
+    try {
+        const { problemId } = req.params;
+        const userId = req.result._id;
+
+        if (!mongoose.isValidObjectId(problemId)) {
+            return res.status(400).json({ error: "Invalid problem id" });
         }
-        console.log("Problem Found");
+        const problem = await Problem.findById(problemId).select("_id");
+        if (!problem) {
+            return res.status(404).json({ error: "Problem doesn't exist" });
+        }
+
         const timestamp = Math.round(new Date().getTime() / 1000);
-        const publicId = `leetcode-solutions/${problemId}/${userId}_${timestamp}`;
+        const publicId = `${folderFor(problemId)}${userId}_${timestamp}`;
         const uploadParams = {
             timestamp: timestamp,
             public_id: publicId,
@@ -35,86 +45,105 @@ const generateUploadSignature=async(req,res)=>{
         res.json({
             signature,
             timestamp,
-            public_id:publicId,
-            api_key:process.env.CLOUDINARY_PUBLIC_API_KEY,
-            cloud_name:process.env.CLOUDINARY_CLOUD_NAME,
+            public_id: publicId,
+            api_key: process.env.CLOUDINARY_PUBLIC_API_KEY,
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
             upload_url: `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/video/upload`
-        })
+        });
     }
-    catch(error){
+    catch (error) {
         console.error('Error generating upload signature:', error);
         res.status(500).json({ error: 'Failed to generate upload credentials' });
     }
 };
-const saveVideoMetadata=async(req,res)=>{
-    try{
-        const {
-        problemId,
-        cloudinaryPublicId,
-        secureUrl,
-        duration,
-        } = req.body;
-        const userId=req.result._id;
-        const cloudinaryResource = await cloudinary.api.resource(
-            cloudinaryPublicId,
-            { resource_type: 'video' }
-        );
-        if (!cloudinaryResource) {
-        return res.status(400).json({ error: 'Video not found on Cloudinary' });
+
+const saveVideoMetadata = async (req, res) => {
+    try {
+        const { problemId, cloudinaryPublicId } = req.body;
+        const userId = req.result._id;
+
+        if (!mongoose.isValidObjectId(problemId) || typeof cloudinaryPublicId !== 'string') {
+            return res.status(400).json({ error: 'problemId and cloudinaryPublicId are required' });
         }
-        const existingVideo = await SolutionVideo.findOne({
-              problemId,
-              userId,
-              cloudinaryPublicId
-            });
+
+        if (!cloudinaryPublicId.startsWith(folderFor(problemId))) {
+            return res.status(400).json({ error: 'Video does not belong to this problem' });
+        }
+
+        const problem = await Problem.findById(problemId).select("_id");
+        if (!problem) {
+            return res.status(404).json({ error: "Problem doesn't exist" });
+        }
+
+        //One video solution per problem extra would just waste storeage and resources
+        const existingVideo = await SolutionVideo.findOne({ problemId });
         if (existingVideo) {
-              return res.status(409).json({ error: 'Video already exists' });
+            return res.status(409).json({ error: 'This problem already has a video. Delete it first.' });
         }
-        const thumbnailUrl = cloudinary.image(cloudinaryResource.public_id,{resource_type: "video"})
-        
-        // https://cloudinary.com/documentation/video_effects_and_enhancements#video_thumbnails
-            // Create video solution record
-            const videoSolution = await SolutionVideo.create({
-              problemId,
-              userId,
-              cloudinaryPublicId,
-              secureUrl,
-              duration: cloudinaryResource.duration || duration,
-              thumbnailUrl
-            });
-            res.status(201).json({
-              message: 'Video solution saved successfully',
-              videoSolution: {
+
+        let cloudinaryResource;
+        try {
+            cloudinaryResource = await cloudinary.api.resource(cloudinaryPublicId, { resource_type: 'video' });
+        } catch (e) {
+            if (e?.http_code === 404 || e?.error?.http_code === 404) {
+                return res.status(400).json({ error: 'Video not found on Cloudinary' });
+            }
+            throw e;
+        }
+        if (!cloudinaryResource?.duration) {
+            return res.status(400).json({ error: 'Uploaded file is not a playable video' });
+        }
+
+        // Trust =Cloudinary always nit browser urls
+        const videoSolution = await SolutionVideo.create({
+            problemId,
+            userId,
+            cloudinaryPublicId: cloudinaryResource.public_id,
+            secureUrl: cloudinaryResource.secure_url,
+            duration: cloudinaryResource.duration,
+            thumbnailUrl: buildThumbnailUrl(cloudinaryResource.public_id)
+        });
+
+        res.status(201).json({
+            message: 'Video solution saved successfully',
+            videoSolution: {
                 id: videoSolution._id,
                 thumbnailUrl: videoSolution.thumbnailUrl,
                 duration: videoSolution.duration,
                 uploadedAt: videoSolution.createdAt
-              }
-            });
-        
-        } 
-        catch (error) {
-            console.error('Error saving video metadata:', error);
-            res.status(500).json({ error: 'Failed to save video metadata' });
+            }
+        });
+    }
+    catch (error) {
+        if (error?.code === 11000) {
+            return res.status(409).json({ error: 'Video already exists' });
         }
-    
+        console.error('Error saving video metadata:', error);
+        res.status(500).json({ error: 'Failed to save video metadata' });
+    }
 };
 
 const deleteVideo = async (req, res) => {
   try {
     const { problemId } = req.params;
-    const userId = req.result._id;
+    if (!mongoose.isValidObjectId(problemId)) {
+      return res.status(400).json({ error: 'Invalid problem id' });
+    }
 
-    const video = await SolutionVideo.findOneAndDelete({problemId:problemId});
-    
-   
-
+    const video = await SolutionVideo.findOne({ problemId });
     if (!video) {
       return res.status(404).json({ error: 'Video not found' });
     }
+    //First delete from cloudinary then from db if clouidinary fails we can retry later
+    const result = await cloudinary.uploader.destroy(video.cloudinaryPublicId, {
+      resource_type: 'video',
+      invalidate: true
+    });
+    if (result.result !== 'ok' && result.result !== 'not found') {
+      return res.status(502).json({ error: 'Could not delete the video from Cloudinary' });
+    }
 
-    await cloudinary.uploader.destroy(video.cloudinaryPublicId, { resource_type: 'video' , invalidate: true });
-
+    await SolutionVideo.deleteOne({ _id: video._id });
     res.json({ message: 'Video deleted successfully' });
 
   } catch (error) {
@@ -123,4 +152,4 @@ const deleteVideo = async (req, res) => {
   }
 };
 
-module.exports = {generateUploadSignature,saveVideoMetadata,deleteVideo};
+module.exports = { generateUploadSignature, saveVideoMetadata, deleteVideo, buildThumbnailUrl };

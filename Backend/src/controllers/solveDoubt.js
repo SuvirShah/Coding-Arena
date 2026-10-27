@@ -50,7 +50,7 @@ STARTER CODE: ${JSON.stringify(startCode || []).slice(0, 1500)}`;
     return res.status(rateLimited ? 429 : 503).json({
       message: rateLimited
         ? "The AI is busy right now (quota reached). Try again in a minute."
-        : "AI is not available right now, try again shortly.",
+        : "AI is not available right now, try again buddy.",
     });
   }
 };

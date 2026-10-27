@@ -6,7 +6,7 @@ const rateLimiter = require('../middleware/rateLimiter');
 
 videoRouter.get("/create/:problemId",adminMiddleware,rateLimiter,generateUploadSignature);
 videoRouter.post("/save",adminMiddleware,rateLimiter,saveVideoMetadata);
-videoRouter.delete("/delete/:problemId",adminMiddleware,deleteVideo);
+videoRouter.delete("/delete/:problemId",adminMiddleware,rateLimiter,deleteVideo);
 
 
 module.exports = videoRouter;
