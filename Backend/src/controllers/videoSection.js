@@ -59,7 +59,7 @@ const generateUploadSignature = async (req, res) => {
 
 const saveVideoMetadata = async (req, res) => {
     try {
-        const { problemId, cloudinaryPublicId } = req.body;
+        const { problemId, cloudinaryPublicId, duration: clientDuration } = req.body;
         const userId = req.result._id;
 
         if (!mongoose.isValidObjectId(problemId) || typeof cloudinaryPublicId !== 'string') {
@@ -90,8 +90,16 @@ const saveVideoMetadata = async (req, res) => {
             }
             throw e;
         }
-        if (!cloudinaryResource?.duration) {
-            return res.status(400).json({ error: 'Uploaded file is not a playable video' });
+        // The Admin API doesn't always include `duration`, but the upload response the browser got does.
+        // Duration is display-only, so fall back to the browser's value if it is a sane number.
+        const reported = Number(cloudinaryResource?.duration);
+        const fromClient = Number(clientDuration);
+        const duration =
+            Number.isFinite(reported) && reported > 0 ? reported
+            : Number.isFinite(fromClient) && fromClient > 0 && fromClient < 86400 ? fromClient
+            : null;
+        if (!duration) {
+            return res.status(400).json({ error: 'Could not determine the video duration' });
         }
 
         // Trust =Cloudinary always nit browser urls
@@ -100,7 +108,7 @@ const saveVideoMetadata = async (req, res) => {
             userId,
             cloudinaryPublicId: cloudinaryResource.public_id,
             secureUrl: cloudinaryResource.secure_url,
-            duration: cloudinaryResource.duration,
+            duration,
             thumbnailUrl: buildThumbnailUrl(cloudinaryResource.public_id)
         });
 
