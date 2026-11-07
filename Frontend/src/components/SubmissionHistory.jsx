@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { STATUS_LABELS } from '../utils/statusLabels';
 import { useSubmissionForProblemByUserQuery } from '../pages/apiSlice';
 
 const SubmissionHistory = ({ problemId }) => {
@@ -13,6 +14,10 @@ const SubmissionHistory = ({ problemId }) => {
       case 'wrong result':
       case 'wrong':
         return 'text-rose-400 bg-rose-500/10 border-rose-500/30';
+      case 'tle':
+      case 'runtime error':
+      case 'compilation error':
+      case 'internal error':
       case 'error':
         return 'text-amber-400 bg-amber-500/10 border-amber-500/30';
       default:
@@ -78,13 +83,13 @@ const SubmissionHistory = ({ problemId }) => {
                   <tr key={sub._id} className="hover:bg-[#26221d] transition-colors duration-200">
                     <td className="py-2.5 px-3">
                       <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getStatusBadge(sub.status)}`}>
-                        {sub.status === 'accepted' ? 'Accepted' : sub.status === 'wrong result' ? 'Wrong Answer' : sub.status}
+                        {STATUS_LABELS[sub.status] || sub.status}
                       </span>
                     </td>
                     <td className="py-2.5 px-3 font-mono text-xs text-[#a09a8e]">{sub.language}</td>
                     <td className="py-2.5 px-3 font-mono text-xs text-[#ffd700]">{sub.runtime ? `${Math.round(sub.runtime * 1000)}ms` : "—"}</td>
                     <td className="py-2.5 px-3 font-mono text-xs text-[#f5a623]">{formatMemory(sub.memory)}</td>
-                    <td className="py-2.5 px-3 font-mono text-xs">{sub.testCasesPassed}/{sub.testCasesTotal}</td>
+                    <td className="py-2.5 px-3 font-mono text-xs">{sub.testCasesPassed}/{sub.totalTestCases}</td>
                     <td className="py-2.5 px-3 text-xs text-[#a09a8e]">{formatDate(sub.createdAt)}</td>
                     <td className="py-2.5 px-3 text-right">
                       <button 
@@ -113,7 +118,7 @@ const SubmissionHistory = ({ problemId }) => {
             <h3 className="font-bold text-lg mb-4 flex items-center justify-between">
               <span>Submission Code ({selectedSubmission.language})</span>
               <span className={`px-3 py-0.5 rounded-full text-xs font-semibold border ${getStatusBadge(selectedSubmission.status)}`}>
-                {selectedSubmission.status}
+                {STATUS_LABELS[selectedSubmission.status] || selectedSubmission.status}
               </span>
             </h3>
             
@@ -125,7 +130,7 @@ const SubmissionHistory = ({ problemId }) => {
                 Memory: <span className="text-[#f5a623] font-bold">{formatMemory(selectedSubmission.memory)}</span>
               </div>
               <div className="bg-[#110f0d] border border-[#382e1e] px-3 py-1.5 rounded-lg text-[#a09a8e]">
-                Passed: <span className="text-[#f0f0f0] font-bold">{selectedSubmission.testCasesPassed}/{selectedSubmission.testCasesTotal}</span>
+                Passed: <span className="text-[#f0f0f0] font-bold">{selectedSubmission.testCasesPassed}/{selectedSubmission.totalTestCases}</span>
               </div>
             </div>
 

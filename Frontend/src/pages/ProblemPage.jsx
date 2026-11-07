@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef } from "react";
-import { useForm } from "react-hook-form";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { STATUS_LABELS } from "../utils/statusLabels";
 import Editor from "@monaco-editor/react";
 import { useParams, useNavigate } from "react-router";
+import { useSelector } from "react-redux";
+import { loadDraft, saveDraft, clearDraft, loadLanguage, saveLanguage } from "../utils/codeDrafts";
 import { useGetProblemByIdQuery, useRunCodeMutation, useSubmitCodeMutation } from "./apiSlice";
 import SubmissionHistory from "../components/SubmissionHistory";
 import ChatAi from "../components/ChatAi";
@@ -33,15 +35,23 @@ public class Main {
 };
 
 const ProblemPage = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState("javascript");
-  const [code, setCode] = useState("");
+  const { problemId } = useParams();
+  const userId = useSelector((state) => state.auth.user?._id);
+  const [selectedLanguage, setSelectedLanguage] = useState(
+    () => loadLanguage(userId, problemId) || "javascript"
+  );
+  // What the user typed during this visit, per language. Wins over a saved draft and the starter code.
+  const [userCode, setUserCode] = useState({});
   const [runResult, setRunResult] = useState(null);
   const [submitResult, setSubmitResult] = useState(null);
   const [activeLeftTab, setActiveLeftTab] = useState("description");
   const [activeRightTab, setActiveRightTab] = useState("testcase");
   const [selectedTestCaseIndex, setSelectedTestCaseIndex] = useState(0);
   const editorRef = useRef(null);
-  const { problemId } = useParams();
+  const runRef = useRef(null);
+  const submitRef = useRef(null);
+  const saveTimer = useRef(null);
+  const pendingSave = useRef(null);
   const navigate = useNavigate();
 
   const { data: problem, isLoading: isFetchingProblem } = useGetProblemByIdQuery(problemId);
@@ -72,18 +82,68 @@ const ProblemPage = () => {
     return DEFAULT_BOILERPLATES[langKey] || boilerplate || "";
   };
 
-  useEffect(() => {
-    if (problem) {
-      setCode(getBoilerplate(selectedLanguage));
+  // Editor text = what you typed now, else your saved draft for this problem/language, else the starter code.
+  // Derived while rendering (no effect), so a background refetch of the problem can never overwrite your code.
+  const starterCode = getBoilerplate(selectedLanguage);
+  const savedDraft = useMemo(
+    () => loadDraft(userId, problemId, selectedLanguage),
+    [userId, problemId, selectedLanguage]
+  );
+  const code = userCode[selectedLanguage] ?? savedDraft ?? starterCode;
+
+  const flushSave = () => {
+    clearTimeout(saveTimer.current);
+    if (pendingSave.current) {
+      pendingSave.current();
+      pendingSave.current = null;
     }
-  }, [selectedLanguage, problem]);
+  };
+
+  // Write to localStorage 400ms after the last keystroke; also on language switch, tab close and leaving the page
+  const scheduleSave = (language, text, starter) => {
+    pendingSave.current = () => saveDraft(userId, problemId, language, text, starter);
+    clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(flushSave, 400);
+  };
+
+  useEffect(() => {
+    const flush = () => {
+      clearTimeout(saveTimer.current);
+      pendingSave.current?.();
+      pendingSave.current = null;
+    };
+    window.addEventListener("beforeunload", flush);
+    return () => {
+      window.removeEventListener("beforeunload", flush);
+      flush();
+    };
+  }, []);
 
   const handleEditorChange = (value) => {
-    setCode(value || "");
+    const next = value || "";
+    setUserCode((prev) => ({ ...prev, [selectedLanguage]: next }));
+    scheduleSave(selectedLanguage, next, starterCode);
+  };
+
+  const handleReset = () => {
+    if (code !== starterCode && !window.confirm("Reset to the starter code? Your current code for this language will be lost.")) {
+      return;
+    }
+    clearTimeout(saveTimer.current);
+    pendingSave.current = null;
+    clearDraft(userId, problemId, selectedLanguage);
+    setUserCode((prev) => ({ ...prev, [selectedLanguage]: starterCode }));
   };
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
+
+    // Ctrl/Cmd+Enter runs the sample tests, Ctrl/Cmd+Shift+Enter submits
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => runRef.current?.());
+    editor.addCommand(
+      monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter,
+      () => submitRef.current?.()
+    );
 
     // Define custom warm dark theme for Monaco to match #110f0d
     monaco.editor.defineTheme("codearena-dark", {
@@ -110,6 +170,8 @@ const ProblemPage = () => {
   };
 
   const handleLanguageChange = (language) => {
+    flushSave();
+    saveLanguage(userId, problemId, language);
     setSelectedLanguage(language);
   };
 
@@ -149,13 +211,19 @@ const ProblemPage = () => {
       console.error("Error submitting code:", error);
       setSubmitResult({
         accepted: false,
-        error: "Submission failed",
+        error: typeof error?.data === "string" ? error.data : "Submission failed",
         passedTestCases: 0,
         totalTestCases: 0,
       });
       setActiveRightTab("result");
     }
   };
+
+  // Keep the keyboard shortcuts pointed at the latest handlers
+  useEffect(() => {
+    runRef.current = () => { if (!loading) handleRun(); };
+    submitRef.current = () => { if (!loading) handleSubmitCode(); };
+  });
 
   const getLanguageForMonaco = (lang) => {
     switch (lang) {
@@ -444,9 +512,7 @@ const ProblemPage = () => {
               <button
                 className="btn btn-sm btn-ghost text-[#a09a8e] hover:text-[#ffd700] hover:bg-[#26221d] rounded-lg px-2.5 transition-all duration-200"
                 title="Reset to default code"
-                onClick={() => {
-                  setCode(getBoilerplate(selectedLanguage));
-                }}
+                onClick={handleReset}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mr-1">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
@@ -540,6 +606,7 @@ const ProblemPage = () => {
                 <button
                   className={`btn btn-sm rounded-lg px-4 sm:px-5 font-semibold bg-[#26221d] hover:bg-[#382e1e] text-[#f0f0f0] border border-[#382e1e] shadow-sm transition-all duration-200 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                   onClick={handleRun}
+                  title="Run sample tests (Ctrl/⌘ + Enter)"
                   disabled={loading}
                 >
                   {loading && activeRightTab === "testcase" ? (
@@ -554,6 +621,7 @@ const ProblemPage = () => {
                 <button
                   className={`btn btn-sm rounded-lg px-5 sm:px-6 font-bold bg-[#ffd700] hover:bg-[#e6c200] text-black shadow-md transition-all duration-200 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                   onClick={handleSubmitCode}
+                  title="Submit (Ctrl/⌘ + Shift + Enter)"
                   disabled={loading}
                 >
                   {loading && activeRightTab === "result" ? (
@@ -704,7 +772,7 @@ const ProblemPage = () => {
                         </div>
 
                         <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1">
-                          {submitResult.accepted ? "Accepted" : submitResult.error || "Wrong Answer"}
+                          {STATUS_LABELS[submitResult.status] || submitResult.error || "Wrong Answer"}
                         </h2>
                         <p className="text-xs text-[#a09a8e]">
                           {submitResult.accepted ? "Congratulations! All test cases passed successfully." : "Your code did not pass all hidden test cases."}

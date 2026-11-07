@@ -16,15 +16,18 @@ const adminMiddleware=async(req,res,next)=>{
         if(!_id)
             throw new Error("Invalid Token");
 
-
-        if(payload.role!='admin')
-            throw new Error("Invalid acess");
+        //Dont trust the token 
+        // if(payload.role!='admin')
+        //     throw new Error("Invalid acess");
 
         const result=await User.findById(_id);
 
         if(!result)
             throw new Error ("User Doesn't Exsist");
-        
+        //Trusting our DB
+        if(result.role!=='admin'){
+            throw new error("Invalid Credentials");
+        }
 
         const isBlocked= await redisClient.exists(`token:${token}`);
 

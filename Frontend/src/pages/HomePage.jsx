@@ -38,7 +38,7 @@ function HomePage() {
   if (debouncedSearch) queryParams.search = debouncedSearch;
 
   // `data` keeps the previous page while the next one loads, so the table doesn't flash empty
-  const { data, isFetching } = useGetProblemsQuery(queryParams);
+  const { data, isFetching, isError, refetch } = useGetProblemsQuery(queryParams);
   const problems = data?.problems ?? [];
   const total = data?.total ?? 0;
   const totalPages = data?.totalPages ?? 1;
@@ -325,8 +325,34 @@ function HomePage() {
               </table>
             </div>
 
+            {/* Loading State (first load only; page changes keep the old rows, dimmed) */}
+            {!data && isFetching && (
+              <div className="py-20 flex flex-col items-center justify-center text-center px-4">
+                <span className="loading loading-spinner loading-lg text-[#ffd700]"></span>
+                <p className="text-[#a09a8e] mt-4 text-sm">
+                  Loading problems... the server may take up to a minute to wake up.
+                </p>
+              </div>
+            )}
+
+            {/* Error State */}
+            {isError && !isFetching && (
+              <div className="py-16 flex flex-col items-center justify-center text-center px-4">
+                <h3 className="text-lg font-bold text-[#f0f0f0]">Couldn't load problems</h3>
+                <p className="text-[#a09a8e] mt-1 max-w-sm">
+                  Something went wrong while talking to the server. Check your connection and try again.
+                </p>
+                <button
+                  onClick={refetch}
+                  className="btn btn-outline btn-sm mt-4 rounded-lg border-[#382e1e] text-[#f0f0f0] hover:bg-[#ffd700] hover:text-black hover:border-[#ffd700] transition-all duration-200"
+                >
+                  Try again
+                </button>
+              </div>
+            )}
+
             {/* Empty State */}
-            {!isFetching && problems.length === 0 && (
+            {!isFetching && !isError && problems.length === 0 && (
               <div className="py-20 flex flex-col items-center justify-center text-center px-4">
                 <div className="bg-[#110f0d] border border-[#382e1e] w-16 h-16 rounded-full flex items-center justify-center mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-[#a09a8e]">

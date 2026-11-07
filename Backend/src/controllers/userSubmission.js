@@ -2,7 +2,12 @@ const Problem = require("../models/problems");
 const User = require("../models/user");
 const Submission = require("../models/submission");
 const mongoose=require("mongoose");
+const { getSubmissionQueue } = require("../config/queue");
 const { getLanguageById, mapJudgeStatus ,submitBatch, submitToken } = require("../utils/ProblemUtility");
+
+const MAX_PENDING_PER_USER = 3;
+// Languages the Submission schema accepts (getLanguageById knows a few more, e.g. python)
+const STORABLE_LANGUAGES = Submission.schema.path("language").enumValues;
 
 const submitCode = async (req, res) => {
   let submission;
@@ -14,11 +19,30 @@ const submitCode = async (req, res) => {
     if (!code || !language) {
       return res.status(400).send("Mandatory Fields Missing");
     }
+    if (!mongoose.isValidObjectId(problemId)) {
+      return res.status(400).send("Invalid problem id");
+    }
+    try {
+      getLanguageById(language);
+    } catch (e) {
+      return res.status(400).send(e.message);
+    }
+    if (!STORABLE_LANGUAGES.includes(language)) {
+      return res.status(400).send(`Unsupported language: ${language}`);
+    }
 
-    const problem = await Problem.findById(problemId).select("hiddenTestCases difficulty");
+    const problem = await Problem.findById(problemId).select("hiddenTestCases");
     if (!problem) return res.status(404).send("Problem not found");
 
-    const language_id = getLanguageById(language);
+  
+    const recentPending = await Submission.countDocuments({
+      userId,
+      status: "pending",
+      createdAt: { $gte: new Date(Date.now() - 5 * 60 * 1000) },
+    });
+    if (recentPending >= MAX_PENDING_PER_USER) {
+      return res.status(429).send("Too many submissions in progress. Wait for them to finish.");
+    }
 
     submission = await Submission.create({
       userId,
@@ -29,81 +53,51 @@ const submitCode = async (req, res) => {
       totalTestCases: problem.hiddenTestCases.length,
     });
 
-    const batch = problem.hiddenTestCases.map((tc) => ({
-      source_code: code,
-      language_id,
-      stdin: tc.input,
-      expected_output: tc.output,
-    }));
-    const created = await submitBatch(batch);
-    const results = await submitToken(created.map((c) => c.token));
+    // jobId = submissionId, so the same submission can never be queued twice
+    await getSubmissionQueue().add(
+      "judge",
+      { submissionId: submission._id.toString() },
+      { jobId: submission._id.toString() }
+    );
 
-    let testCasesPassed = 0;
-    let runtime = 0;
-    let memory = 0;
-    let status = "accepted";
-    let errorMessage = "";
-
-    for (const test of results) {
-      runtime += parseFloat(test.time || 0);
-      memory = Math.max(memory, test.memory || 0);
-      if (test.status_id === 3) {
-        testCasesPassed++;
-      } else if (status === "accepted") {
-        // record the first failure only
-        status = mapJudgeStatus(test.status_id);
-        errorMessage = test.stderr || test.compile_output || test.message || "Execution failed";
-      }
-    }
-
-    let firstSolve = false;
-    const session = await mongoose.startSession();
-    try {
-      await session.withTransaction(async () => {
-        firstSolve = false; // callback can be retried by the driver
-        await Submission.updateOne(
-          { _id: submission._id },
-          { $set: { status, testCasesPassed, errorMessage, runtime, memory } },
-          { session }
-        );
-
-        if (status === "accepted") {
-          const inc = { "stats.solved": 1 };
-          if (["easy", "medium", "hard"].includes(problem.difficulty)) {
-            inc[`stats.${problem.difficulty}`] = 1;
-          }
-          // the $ne filter makes "first solve" atomic under concurrent submits
-          const r = await User.updateOne(
-            { _id: userId, problemSolved: { $ne: problemId } },
-            { $addToSet: { problemSolved: problemId }, $inc: inc },
-            { session }
-          );
-          firstSolve = r.modifiedCount === 1;
-        }
-      });
-    } finally {
-      await session.endSession();
-    }
-
-    const saved = await Submission.findById(submission._id).lean();
-
-    return res.status(201).send({
-      accepted: status === "accepted",
-      firstSolve,
-      passedTestCases: testCasesPassed,
-      totalTestCases: problem.hiddenTestCases.length,
-      runtime,
-      memory,
-      error: errorMessage,
-      submission: saved,
-    });
+    return res.status(202).send({ submissionId: submission._id, status: "pending" });
   } catch (err) {
     if (submission) {
       await Submission.updateOne(
         { _id: submission._id },
-        { $set: { status: "internal error", errorMessage: err.message } }
+        { $set: { status: "internal error", errorMessage: "Could not queue submission" } }
       ).catch(() => {});
     }
+    return res.status(500).send("Error " + err.message);
+  }
+};
+
+const getSubmissionStatus = async (req, res) => {
+  try {
+    const { submissionId } = req.params;
+    if (!mongoose.isValidObjectId(submissionId)) {
+      return res.status(400).send("Invalid submission id");
+    }
+
+    const submission = await Submission.findOne({ _id: submissionId, userId: req.result._id }).lean();
+    if (!submission) return res.status(404).send("Submission not found");
+
+    if (submission.status === "pending") {
+      return res.status(200).send({ status: "pending" });
+    }
+
+    
+    return res.status(200).send({
+      status: submission.status,
+      accepted: submission.status === "accepted",
+      passedTestCases: submission.testCasesPassed,
+      totalTestCases: submission.totalTestCases,
+      runtime: submission.runtime,
+      memory: submission.memory,
+      error: submission.errorMessage,
+      submission,
+    });
+  } catch (err) {
     return res.status(500).send("Error " + err.message);
   }
 };
@@ -168,4 +162,4 @@ const runCode = async (req, res) => {
   }
 };
 
-module.exports = { submitCode, runCode };
+module.exports = { submitCode, getSubmissionStatus, runCode };

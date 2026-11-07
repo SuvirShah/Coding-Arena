@@ -47,6 +47,7 @@ app.use("/submission",submitRouter);
 app.use('/ai',aiRouter);
 app.use("/video",videoRouter);
 
+let worker;
 
 const IntializeConnection=async()=>{
 
@@ -57,14 +58,23 @@ const IntializeConnection=async()=>{
         app.listen(PORT,()=>{
         console.log(`Server Listening at ${PORT}`);
         })
+        if (process.env.RUN_WORKER !== "false") {
+            const startSubmissionWorker = require("./workers/submissionWorker");
+            worker = startSubmissionWorker();
+        }
     }
     catch(err){
         console.log("Error"+err);
     }
 }
+const shutdown = async () => {
+    try { await worker?.close(); } finally { process.exit(0); }
+};
 
 
 if (process.env.NODE_ENV !== 'test') {
+    process.on("SIGTERM", shutdown);
+    process.on("SIGINT", shutdown);
     IntializeConnection();
 }
 module.exports = app;

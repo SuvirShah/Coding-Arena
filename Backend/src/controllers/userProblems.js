@@ -4,6 +4,7 @@ const User=require("../models/user");
 const Submission = require("../models/submission");
 const SolutionVideo = require("../models/solutionVideo");
 const mongoose=require('mongoose');
+const { destroyCloudinaryVideo } = require("./videoSection");
 
 const createProblem=async(req,res)=>{
     const {title,description,difficulty,tags,visibleTestCases,
@@ -98,10 +99,46 @@ const deleteProblem=async(req,res)=>{
         if(!id){
             return res.status(400).send("No Problem Id send");
         }
-        const ProblemToBeDeleted=await Problem.findByIdAndDelete(id);
-        if(!ProblemToBeDeleted){
+        if(!mongoose.isValidObjectId(id)){
+            return res.status(400).send("Invalid Problem Id");
+        }
+        const problem=await Problem.findById(id).select("difficulty");
+        if(!problem){
             return res.status(404).send("No Such Problem Exsists");
         }
+        const video=await SolutionVideo.findOne({problemId:problem._id});
+        if(video){
+            const removed=await destroyCloudinaryVideo(video.cloudinaryPublicId);
+            if(!removed){
+                return res.status(502).send("Could not delete solution video try again");
+            }
+        }
+        const dec={"stats.solved":-1};
+        if(["easy","medium","hard"].includes(problem.difficulty)){
+            dec[`stats.${problem.difficulty}`]=-1;
+        }
+        const session=mongoose.startSession();
+        try{
+            (await session).withTransaction(async()=>{
+                await User.updateMany(
+                    {problemSolved:problem._id},
+                    {$pull:{problemSolved:problem._id},$inc:dec},
+                    {session}
+                );
+                await User.updateMany(
+                    {$or:[{"stats.solved":{$lt:0}},{"stats.easy":{$lt:0}},{"stats.medium":{$lt:0}},{"stats.hard":{$lt:0}}]},
+                    {$max:{"stats.solved":0,"stats.easy":0,"stats.medium":0,"stats.hard":0}},
+                    {session}
+                );
+                await Submission.deleteMany({problemId:problem._id},{session});
+                await SolutionVideo.deleteMany({problemId:problem._id},{session});
+                await Problem.deleteOne({_id:problem._id},{session});
+            })
+        }
+        finally{
+            await session.endSession();
+        }
+
         res.status(200).send("Problem Sucessfully Deleted");
     }
     catch(err){

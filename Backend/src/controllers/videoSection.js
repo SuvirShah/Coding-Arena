@@ -11,6 +11,14 @@ cloudinary.config({
 
 const folderFor = (problemId) => `leetcode-solutions/${problemId}/`;
 
+const destroyCloudinaryVideo = async (publicId) => {
+  const result = await cloudinary.uploader.destroy(publicId, {
+    resource_type: 'video',
+    invalidate: true
+  });
+  return result.result === 'ok' || result.result === 'not found';
+};
+
 const buildThumbnailUrl = (publicId) =>
   cloudinary.url(publicId, {
     resource_type: 'video',
@@ -143,11 +151,8 @@ const deleteVideo = async (req, res) => {
       return res.status(404).json({ error: 'Video not found' });
     }
     //First delete from cloudinary then from db if clouidinary fails we can retry later
-    const result = await cloudinary.uploader.destroy(video.cloudinaryPublicId, {
-      resource_type: 'video',
-      invalidate: true
-    });
-    if (result.result !== 'ok' && result.result !== 'not found') {
+    const removed = await destroyCloudinaryVideo(video.cloudinaryPublicId);
+    if (!removed) {
       return res.status(502).json({ error: 'Could not delete the video from Cloudinary' });
     }
 
@@ -160,4 +165,4 @@ const deleteVideo = async (req, res) => {
   }
 };
 
-module.exports = { generateUploadSignature, saveVideoMetadata, deleteVideo, buildThumbnailUrl };
+module.exports = { generateUploadSignature, saveVideoMetadata, deleteVideo, buildThumbnailUrl, destroyCloudinaryVideo };

@@ -64,6 +64,8 @@ const login=async(req,res)=>{
     try{
         const {emailId,password}=req.body;
         console.log(`[LOGIN] Attempt for email: ${emailId}`);
+        if(typeof emailId!=="string" || typeof password!=="string" || !emailId || !password)
+            throw new Error("Invalid Credentials");
 
         if(!emailId)
             throw new Error("Invalid Credentials");
@@ -109,8 +111,6 @@ const login=async(req,res)=>{
             message:"Logged In Sucessfully"
         });
 
-
-
     }
 
     catch(err){
@@ -128,8 +128,8 @@ const logout=async(req,res)=>{
         if(token){
             const payload=jwt.decode(token);
             if(payload && payload.exp){
-                await redisClient.set(`token:${token}`,"Blocked");
-                await redisClient.expireAt(`token:${token}`,payload.exp);
+                // One atomic command: the key can never be left without an expiry previoulsy version used to first set token first and then set expiry
+                await redisClient.set(`token:${token}`,"Blocked",{expiration:{type:"EXAT",value:payload.exp}});
             }
         }
 
@@ -159,7 +159,13 @@ const adminRegister=async(req,res)=>{
         req.body.password=await bcrypt.hash(password,10);
         // req.body.role='admin';
 
-        const user=await User.create(req.body);
+        const user=await User.create({
+            firstName:firstName.trim(),
+            ...(typeof lastName==="string"?{lastName:lastName.trim()}:{}),
+            emailId,
+            password:hashedPassword,
+            role:"admin"
+        })
 
         const token=jwt.sign({_id:user._id,emailId:emailId,role:user.role},process.env.JWT_KEY,{expiresIn:60*60});
 

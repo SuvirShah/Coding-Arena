@@ -21,17 +21,11 @@ function Login() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated, loading, error } = useSelector((state) => state.auth);
+  const { loading, error, sessionExpired } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(clearError());
   }, [dispatch]);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/');
-    }
-  }, [isAuthenticated, navigate]);
 
   const onSubmit = async (data) => {
     await dispatch(loginUser(data));
@@ -74,6 +68,7 @@ function Login() {
               <input
                 {...register("emailId")}
                 type="email"
+                autoComplete="email"
                 placeholder="you@example.com"
                 className={`input input-bordered w-full rounded-xl bg-base-200/50 focus:bg-base-100 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all ${errors.emailId ? 'border-error focus:ring-error/30' : ''}`}
               />
@@ -94,6 +89,7 @@ function Login() {
                 <input
                   {...register("password")}
                   type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
                   placeholder="••••••••"
                   className={`input input-bordered w-full rounded-xl bg-base-200/50 focus:bg-base-100 focus:outline-none focus:ring-2 focus:ring-primary/30 pr-12 transition-all ${errors.password ? 'border-error focus:ring-error/30' : ''}`}
                 />
@@ -120,8 +116,14 @@ function Login() {
               )}
             </div>
 
+            {sessionExpired && !error && (
+              <div role="status" className="p-3 mt-2 rounded-xl bg-warning/10 border border-warning/30 text-warning text-sm font-medium">
+                Your session expired. Please sign in again to continue.
+              </div>
+            )}
+
             {error && (
-              <div className="p-3 mt-2 rounded-xl bg-error/10 border border-error/20 flex items-start gap-2">
+              <div role="alert" className="p-3 mt-2 rounded-xl bg-error/10 border border-error/20 flex items-start gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-error mt-0.5 shrink-0"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" /></svg>
                 <p className="text-error text-sm font-medium">{error}</p>
               </div>

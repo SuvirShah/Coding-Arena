@@ -11,7 +11,7 @@ const Problem = require("../src/models/problems");
     const solved = await Problem.find({ _id: { $in: u.problemSolved } }).select("difficulty");
     const stats = { solved: solved.length, easy: 0, medium: 0, hard: 0 };
     for (const p of solved) if (stats[p.difficulty] !== undefined) stats[p.difficulty]++;
-    await User.updateOne({ _id: u._id }, { $set: { stats } });
+    await User.updateOne({ _id: u._id }, { $set: { stats, problemSolved: solved.map((p) => p._id) } });
   }
   console.log(`Backfilled ${users.length} users`);
   await mongoose.disconnect();
