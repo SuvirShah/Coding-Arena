@@ -2,6 +2,8 @@ import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "./authSlice";
 import { useGetProfileQuery } from "./apiSlice";
+import { STATUS_LABELS } from "../utils/statusLabels";
+import ActivityHeatmap from "../components/ActivityHeatmap";
 
 function ProfilePage() {
   const dispatch = useDispatch();
@@ -31,6 +33,8 @@ function ProfilePage() {
     "runtime error": "badge-error",
     tle: "badge-error",
     mle: "badge-error",
+    "compilation error": "badge-error",
+    "internal error": "badge-warning",
   };
 
   // Loading state
@@ -318,6 +322,7 @@ function ProfilePage() {
             </div>
           </div>
         </div>
+        <ActivityHeatmap activity={profile.activity} />
 
         {/* Recent Submissions Table */}
         <div className="bg-base-100 rounded-xl border border-base-300 overflow-hidden shadow-sm">
@@ -348,12 +353,17 @@ function ProfilePage() {
                     <tr key={sub._id} className="hover">
                       <td className="text-base-content/50">{idx + 1}</td>
                       <td className="font-medium">
-                        <button
-                          className="link link-hover link-primary text-sm"
-                          onClick={() => navigate(`/problem/${sub.problemId}`)}
-                        >
-                          {sub.problemId}
-                        </button>
+                        {/* The API sends { _id, title } (older versions sent just the id); null = problem was deleted */}
+                        {sub.problemId?._id || typeof sub.problemId === "string" ? (
+                          <button
+                            className="link link-hover link-primary text-sm"
+                            onClick={() => navigate(`/problem/${sub.problemId?._id ?? sub.problemId}`)}
+                          >
+                            {sub.problemId?.title || "View problem"}
+                          </button>
+                        ) : (
+                          <span className="text-sm text-base-content/40 italic">Deleted problem</span>
+                        )}
                       </td>
                       <td>
                         <span className="badge badge-ghost badge-sm capitalize">
@@ -366,7 +376,7 @@ function ProfilePage() {
                             STATUS_BADGE[sub.status] || "badge-ghost"
                           }`}
                         >
-                          {sub.status}
+                          {STATUS_LABELS[sub.status] || sub.status}
                         </span>
                       </td>
                       <td className="text-sm">

@@ -204,7 +204,7 @@ const getProfile = async (req, res) => {
     try {
         const userId = req.result._id;
         const since = new Date();
-        since.setDate(since.getDate() - 365);
+        since.setDate(since.getDate() - 371);
 
         const [user, total, accepted, recent, activity] = await Promise.all([
             User.findById(userId)
@@ -217,6 +217,7 @@ const getProfile = async (req, res) => {
                 .sort({ createdAt: -1 })
                 .limit(10)
                 .select("problemId language status runtime memory testCasesPassed totalTestCases createdAt")
+                .populate({ path: "problemId", select: "title" })
                 .lean(),
             Submission.aggregate([
                 { $match: { userId, createdAt: { $gte: since } } },
@@ -256,7 +257,7 @@ const getProfile = async (req, res) => {
                 acceptanceRate: total > 0 ? Math.round((accepted / total) * 100) : 0,
                 recent,
             },
-            // new: [{ _id: "2026-10-24", count: 3 }, ...] for a heatmap later
+            // [{ date: "2026-10-24", count: 3 }, ...] for the activity heatmap
             activity: activity.map((a) => ({ date: a._id, count: a.count })),
         });
     } catch (err) {
